@@ -1,0 +1,42 @@
+# Netlify configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# This file tells Netlify how to build and serve the site.
+
+[build]
+  # Where to run the build command from
+  base = "."
+  # Build command
+  command = "npm run build"
+  # Where the built files are (Vite outputs to 'dist/')
+  publish = "dist"
+
+# SPA redirect — all routes go to index.html
+# (Needed if you ever add client-side routing)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers — good practice, helps Lighthouse security score
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # Content Security Policy — allow self + Google Apps Script for form submission
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline';
+      connect-src 'self' https://script.google.com https://script.googleusercontent.com;
+      img-src 'self' data:;
+      frame-ancestors 'none'
+    """
+
+# Cache static assets aggressively (Vite hashes filenames)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
