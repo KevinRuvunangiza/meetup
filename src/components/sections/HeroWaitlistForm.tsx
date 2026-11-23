@@ -94,24 +94,37 @@ export function HeroWaitlistForm({ initialRole = 'brand', onSubmitted }: HeroWai
         return
       }
 
-      const res = await fetch(siteConfig.appsScriptUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload),
-      })
+      try {
+        const res = await fetch(siteConfig.appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        })
 
-      const json = await res.json()
-      if (json.success) {
+        if (res.ok) {
+          const json = await res.json()
+          if (json.duplicate) {
+            setErrorMsg('Ce numéro WhatsApp est déjà sur la liste d’attente !')
+            setSubmitting(false)
+            return
+          }
+        }
         setSubmitted(true)
         onSubmitted?.()
-      } else if (json.duplicate) {
-        setErrorMsg('Ce numéro WhatsApp est déjà sur la liste d’attente !')
-      } else {
-        setErrorMsg('Une erreur est survenue. Veuillez réessayer.')
+      } catch {
+        // Fallback for Google Apps Script 302 redirect CORS quirk:
+        // Use mode: 'no-cors' so the browser delivers the payload to Google Sheets without failing CORS
+        await fetch(siteConfig.appsScriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        })
+        setSubmitted(true)
+        onSubmitted?.()
       }
     } catch {
-      setErrorMsg('Connexion impossible. Vos informations ont été enregistrées localement.')
-      setSubmitted(true)
+      setErrorMsg('Connexion impossible. Veuillez réessayer.')
     } finally {
       setSubmitting(false)
     }

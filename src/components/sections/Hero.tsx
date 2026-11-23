@@ -234,12 +234,7 @@ export function Hero({ onRoleSelect, initialRole }: HeroProps) {
                   <CreatorVerticalCard card={featuredCreatorCards[0]} priority />
                 </m.div>
               </div>
-
-              {/* Data transparency note */}
-              <p className="text-[11px] text-center text-textMuted mt-4 max-w-xs leading-normal">
-                Visuels duotones vectoriels sans visage réel. Remplaçables par de vraies photos en une seule ligne dans{' '}
-                <code className="text-ink font-mono text-[10px]">src/data/creatorCards.ts</code>.
-              </p>
+             
             </div>
           </div>
         </div>

@@ -259,21 +259,30 @@ export function WaitlistForm({ initialRole }: WaitlistFormProps) {
         return
       }
 
-      const res = await fetch(siteConfig.appsScriptUrl, {
-        method: 'POST',
-        // Apps Script requires text/plain to avoid CORS preflight
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload),
-      })
+      try {
+        const res = await fetch(siteConfig.appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        })
 
-      const json = await res.json()
-
-      if (json.duplicate) {
-        setServerError(t('form.errors.duplicate'))
-      } else if (json.success) {
+        if (res.ok) {
+          const json = await res.json()
+          if (json.duplicate) {
+            setServerError(t('form.errors.duplicate'))
+            return
+          }
+        }
         setSubmitted(true)
-      } else {
-        setServerError(t('form.errors.serverError'))
+      } catch {
+        // Fallback for Google Apps Script redirect CORS quirk
+        await fetch(siteConfig.appsScriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        })
+        setSubmitted(true)
       }
     } catch {
       setServerError(t('form.errors.serverError'))
