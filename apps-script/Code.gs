@@ -17,7 +17,7 @@
  * 5. At the top of the editor, find the constant SPREADSHEET_ID below.
  *    Replace 'YOUR_SPREADSHEET_ID_HERE' with the ID from your spreadsheet URL.
  *    The URL looks like:
- *      https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXXXXX/edit
+ *      https://docs.google.com/spreadsheets/d/1_ptRYh9P7VtsFYjijv2YgwT8xxXN-qtit6FNuhvAiaQ/edit
  *    Copy the XXXXXXXXXXXXXXXX part.
  *
  * 6. Click File → Save. Name the project "MEETUP Waitlist".
@@ -35,14 +35,14 @@
  *     It is YOUR script — this is normal for self-deployed scripts.)
  *
  * 9. Copy the Web app URL that appears.
- *    It looks like: https://script.google.com/macros/s/XXXXX/exec
+ *    It looks like: https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
  *
  * 10. In your project, create a file called .env.local (copy from .env.example):
- *     VITE_APPS_SCRIPT_URL=https://script.google.com/macros/s/XXXXX/exec
+ *     VITE_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
  *
  * 11. On Netlify, go to Site configuration → Environment variables and add:
  *     Key:   VITE_APPS_SCRIPT_URL
- *     Value: https://script.google.com/macros/s/XXXXX/exec
+ *     Value: https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
  *
  * 12. To test: submit the form on your site. Check the spreadsheet.
  *     If nothing appears, open the Apps Script editor → Executions tab
@@ -74,24 +74,47 @@
  */
 
 // !! CHANGE THIS to your spreadsheet ID !!
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+const SPREADSHEET_ID = "1_ptRYh9P7VtsFYjijv2YgwT8xxXN-qtit6FNuhvAiaQ";
 
 // Sheet tab names (must match what you created in step 2)
-const BRANDS_SHEET = 'Brands';
-const CREATORS_SHEET = 'Creators';
+const BRANDS_SHEET = "Brands";
+const CREATORS_SHEET = "Creators";
 
 // Column headers for each sheet
 const BRAND_HEADERS = [
-  'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
-  'Business Name', 'Sector', 'Creator Need', 'Budget', 'Worked Before',
-  'Website/Instagram'
+  "Timestamp",
+  "Source",
+  "Full Name",
+  "WhatsApp",
+  "Email",
+  "City",
+  "Business Name",
+  "Sector",
+  "Creator Need",
+  "Budget",
+  "Worked Before",
+  "Website/Instagram",
 ];
 
 const CREATOR_HEADERS = [
-  'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
-  'Creator Name', 'Creator Type', 'Niches', 'Instagram Handle', 'Instagram Followers',
-  'TikTok Handle', 'TikTok Followers', 'YouTube Handle', 'YouTube Followers',
-  'Portfolio Link', 'Paid Before', 'Rate Range'
+  "Timestamp",
+  "Source",
+  "Full Name",
+  "WhatsApp",
+  "Email",
+  "City",
+  "Creator Name",
+  "Creator Type",
+  "Niches",
+  "Instagram Handle",
+  "Instagram Followers",
+  "TikTok Handle",
+  "TikTok Followers",
+  "YouTube Handle",
+  "YouTube Followers",
+  "Portfolio Link",
+  "Paid Before",
+  "Rate Range",
 ];
 
 /**
@@ -101,7 +124,7 @@ const CREATOR_HEADERS = [
 function doPost(e) {
   try {
     // Parse body
-    const raw = e.postData ? e.postData.contents : '{}';
+    const raw = e.postData ? e.postData.contents : "{}";
     const payload = JSON.parse(raw);
 
     // Server-side validation
@@ -114,24 +137,23 @@ function doPost(e) {
 
     // Honeypot check — if 'honeypot' field is not empty, silently accept
     // (don't tell bots we detected them)
-    if (data.honeypot && data.honeypot.trim() !== '') {
-      return jsonResponse({ success: true, message: 'Registered.' });
+    if (data.honeypot && data.honeypot.trim() !== "") {
+      return jsonResponse({ success: true, message: "Registered." });
     }
 
     // Open spreadsheet
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-    if (data.role === 'brand') {
+    if (data.role === "brand") {
       return handleBrand(ss, data, payload.timestamp);
-    } else if (data.role === 'creator') {
+    } else if (data.role === "creator") {
       return handleCreator(ss, data, payload.timestamp);
     } else {
-      return jsonResponse({ success: false, message: 'Invalid role.' });
+      return jsonResponse({ success: false, message: "Invalid role." });
     }
-
   } catch (err) {
-    console.error('doPost error:', err);
-    return jsonResponse({ success: false, message: 'Server error.' });
+    console.error("doPost error:", err);
+    return jsonResponse({ success: false, message: "Server error." });
   }
 }
 
@@ -139,9 +161,9 @@ function doPost(e) {
  * Handle GET requests (useful for testing that the endpoint is reachable).
  */
 function doGet() {
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'MEETUP Waitlist API is running.' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(
+    JSON.stringify({ status: "MEETUP Waitlist API is running." }),
+  ).setMimeType(ContentService.MimeType.JSON);
 }
 
 // ─── Brand handler ────────────────────────────────────────────────────────────
@@ -150,30 +172,35 @@ function handleBrand(ss, data, timestamp) {
   const sheet = getOrCreateSheet(ss, BRANDS_SHEET, BRAND_HEADERS);
 
   // Duplicate check by WhatsApp number
-  if (isDuplicate(sheet, data.whatsapp, 4)) { // column 4 = WhatsApp (1-indexed)
-    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
+  if (isDuplicate(sheet, data.whatsapp, 4)) {
+    // column 4 = WhatsApp (1-indexed)
+    return jsonResponse({
+      success: false,
+      duplicate: true,
+      message: "Already registered.",
+    });
   }
 
   const serverTimestamp = new Date().toISOString();
   const row = [
-    serverTimestamp,                        // Timestamp (server-generated)
-    data.source || 'direct',               // Source/UTM
-    sanitize(data.fullName),               // Full Name
-    sanitize(data.whatsapp),               // WhatsApp
-    sanitize(data.email || ''),            // Email
-    sanitize(data.city),                   // City
-    sanitize(data.businessName || ''),     // Business Name
-    sanitize(data.sector || ''),           // Sector
-    sanitize(data.creatorNeed || ''),      // Creator Need
-    sanitize(data.budget || ''),           // Budget
-    sanitize(data.workedBefore || ''),     // Worked Before
-    sanitize(data.websiteOrInsta || ''),   // Website/Instagram
+    serverTimestamp, // Timestamp (server-generated)
+    data.source || "direct", // Source/UTM
+    sanitize(data.fullName), // Full Name
+    sanitize(data.whatsapp), // WhatsApp
+    sanitize(data.email || ""), // Email
+    sanitize(data.city), // City
+    sanitize(data.businessName || ""), // Business Name
+    sanitize(data.sector || ""), // Sector
+    sanitize(data.creatorNeed || ""), // Creator Need
+    sanitize(data.budget || ""), // Budget
+    sanitize(data.workedBefore || ""), // Worked Before
+    sanitize(data.websiteOrInsta || ""), // Website/Instagram
   ];
 
   sheet.appendRow(row);
-  console.log('Brand registered:', data.whatsapp, timestamp);
+  console.log("Brand registered:", data.whatsapp, timestamp);
 
-  return jsonResponse({ success: true, message: 'Brand registered.' });
+  return jsonResponse({ success: true, message: "Brand registered." });
 }
 
 // ─── Creator handler ──────────────────────────────────────────────────────────
@@ -183,37 +210,41 @@ function handleCreator(ss, data, timestamp) {
 
   // Duplicate check by WhatsApp number
   if (isDuplicate(sheet, data.whatsapp, 4)) {
-    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
+    return jsonResponse({
+      success: false,
+      duplicate: true,
+      message: "Already registered.",
+    });
   }
 
   const serverTimestamp = new Date().toISOString();
-  const niches = Array.isArray(data.niches) ? data.niches.join(', ') : '';
+  const niches = Array.isArray(data.niches) ? data.niches.join(", ") : "";
 
   const row = [
     serverTimestamp,
-    data.source || 'direct',
+    data.source || "direct",
     sanitize(data.fullName),
     sanitize(data.whatsapp),
-    sanitize(data.email || ''),
+    sanitize(data.email || ""),
     sanitize(data.city),
-    sanitize(data.creatorName || ''),
-    sanitize(data.creatorType || ''),
+    sanitize(data.creatorName || ""),
+    sanitize(data.creatorType || ""),
     sanitize(niches),
-    sanitize(data.instagramHandle || ''),
-    sanitize(data.instagramFollowers || ''),
-    sanitize(data.tiktokHandle || ''),
-    sanitize(data.tiktokFollowers || ''),
-    sanitize(data.youtubeHandle || ''),
-    sanitize(data.youtubeFollowers || ''),
-    sanitize(data.portfolioLink || ''),
-    sanitize(data.paidBefore || ''),
-    sanitize(data.rateRange || ''),
+    sanitize(data.instagramHandle || ""),
+    sanitize(data.instagramFollowers || ""),
+    sanitize(data.tiktokHandle || ""),
+    sanitize(data.tiktokFollowers || ""),
+    sanitize(data.youtubeHandle || ""),
+    sanitize(data.youtubeFollowers || ""),
+    sanitize(data.portfolioLink || ""),
+    sanitize(data.paidBefore || ""),
+    sanitize(data.rateRange || ""),
   ];
 
   sheet.appendRow(row);
-  console.log('Creator registered:', data.whatsapp, timestamp);
+  console.log("Creator registered:", data.whatsapp, timestamp);
 
-  return jsonResponse({ success: true, message: 'Creator registered.' });
+  return jsonResponse({ success: true, message: "Creator registered." });
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,7 +261,7 @@ function getOrCreateSheet(ss, name, headers) {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
     // Bold the header row
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
   }
   return sheet;
 }
@@ -255,7 +286,7 @@ function isDuplicate(sheet, value, columnIndex) {
  * strip spaces, dashes, parentheses.
  */
 function normalisePhone(phone) {
-  return phone.replace(/[\s\-().]/g, '');
+  return phone.replace(/[\s\-().]/g, "");
 }
 
 /**
@@ -263,7 +294,7 @@ function normalisePhone(phone) {
  */
 function sanitize(value) {
   const str = String(value).trim();
-  if (['+', '-', '=', '@', '\t', '\r'].some(ch => str.startsWith(ch))) {
+  if (["+", "-", "=", "@", "\t", "\r"].some((ch) => str.startsWith(ch))) {
     return "'" + str; // Prefix with apostrophe to treat as text in Sheets
   }
   return str;
@@ -273,24 +304,24 @@ function sanitize(value) {
  * Server-side validation — minimal but explicit.
  */
 function validatePayload(payload) {
-  if (!payload || typeof payload !== 'object') {
-    return { ok: false, message: 'Invalid payload.' };
+  if (!payload || typeof payload !== "object") {
+    return { ok: false, message: "Invalid payload." };
   }
 
   const data = payload.data;
-  if (!data) return { ok: false, message: 'Missing data.' };
+  if (!data) return { ok: false, message: "Missing data." };
 
-  if (!['brand', 'creator'].includes(data.role)) {
-    return { ok: false, message: 'Invalid role.' };
+  if (!["brand", "creator"].includes(data.role)) {
+    return { ok: false, message: "Invalid role." };
   }
 
   if (!data.fullName || !data.whatsapp || !data.city) {
-    return { ok: false, message: 'Missing required fields.' };
+    return { ok: false, message: "Missing required fields." };
   }
 
   // Basic phone format: starts with +, 7–15 digits
-  if (!/^\+\d{7,15}$/.test(data.whatsapp.replace(/\s/g, ''))) {
-    return { ok: false, message: 'Invalid WhatsApp number.' };
+  if (!/^\+\d{7,15}$/.test(data.whatsapp.replace(/\s/g, ""))) {
+    return { ok: false, message: "Invalid WhatsApp number." };
   }
 
   return { ok: true };
@@ -301,7 +332,7 @@ function validatePayload(payload) {
  * Apps Script web apps need CORS headers for cross-origin fetch().
  */
 function jsonResponse(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON,
+  );
 }

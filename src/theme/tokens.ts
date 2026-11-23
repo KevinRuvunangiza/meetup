@@ -1,38 +1,47 @@
 /**
  * DESIGN TOKENS
  * ─────────────────────────────────────────────────────────────────────────────
- * This is the SINGLE source of truth for all visual values.
- * Change a value here → it updates everywhere (Tailwind utilities, CSS vars,
- * and any Motion keyframes that reference CSS variables).
+ * SINGLE SOURCE OF TRUTH for all visual values across the project.
  *
- * Rules enforced here:
- *  • Yellow (#FFD60A) is NEVER used as text color on light backgrounds.
- *  • Text placed ON a yellow background MUST use `ink` (#0B0B0C).
- *  • Page backgrounds use `paper` or `ink`, never pure black (#000) or white (#fff).
+ * Rules:
+ *  • Ink (#0E0E0E) is the primary dark tone; Cream (#F4EFE6) is the light base.
+ *  • Saffron (#F2A900, hover #D99700) is the ~5% accent.
+ *  • Text on saffron MUST always be ink (#0E0E0E).
+ *  • Headings use Bricolage Grotesque; body text uses Hanken Grotesk.
+ *  • On dark backgrounds, text is off-white (#E8E4DD), never low-contrast gray-500.
  */
 
 export const colors = {
   // Base surfaces
-  ink: '#0B0B0C',      // darkest — dark section backgrounds, headings on light
-  charcoal: '#1A1A1C', // slightly lighter dark — card backgrounds in dark sections
-  paper: '#FAFAF7',    // off-white — main page background (never pure white)
-  white: '#FFFFFF',    // pure white — used for text on dark, and card surfaces
+  ink: '#0E0E0E',           // deep black/ink
+  charcoal: '#1A1918',      // cards on dark backgrounds
+  cream: '#F4EFE6',         // warm cream base surface (replaces sterile white)
+  creamCard: '#FFFFFF',     // crisp elevated card surfaces on cream
+  creamDarker: '#EAE4D8',   // subtle chips / borders
+  paper: '#F4EFE6',         // backwards-compatibility alias for cream
+  white: '#FFFFFF',
 
-  // Accent — use sparingly
-  signal: '#FFD60A',       // primary CTA background, key highlights
-  signalHover: '#F2C700',  // button hover state
-  signalSoft: '#FFF4B8',   // very light yellow tint for subtle highlights
+  // Saffron Accent (~5% of surface)
+  saffron: '#F2A900',       // primary CTA & verified highlight
+  saffronHover: '#D99700',  // button hover state
+  saffronSoft: '#FDF3DA',   // subtle tinted accent pill background
+  signal: '#F2A900',        // backwards-compatibility alias
+  signalHover: '#D99700',   // backwards-compatibility alias
+  signalSoft: '#FDF3DA',    // backwards-compatibility alias
 
   // Typography shades
-  textMuted: '#5B5B60',   // secondary body text, captions
-  border: '#E6E4DD',      // dividers, input borders on light backgrounds
-  borderDark: '#2E2E32',  // dividers on dark backgrounds
+  textMuted: '#5F5B54',     // secondary body text on cream
+  textOffWhite: '#E8E4DD',  // readable body text on ink
+  textMutedDark: '#A49F96', // secondary captions on ink
+
+  // Borders
+  border: '#E2DCD2',        // dividers and input borders on cream
+  borderDark: '#282624',    // dividers on dark backgrounds
 } as const
 
 export const fonts = {
-  // We use system fonts for now — zero network cost, good rendering on Android.
-  // Google Fonts can be swapped in by changing these two values.
-  sans: '"Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+  display: '"Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  sans: '"Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   mono: 'ui-monospace, SFMono-Regular, Menlo, monospace',
 } as const
 
@@ -40,14 +49,15 @@ export const fontSize = {
   // Mobile-first scale (rem). Desktop sizes via Tailwind responsive prefixes.
   xs:   ['0.75rem',  { lineHeight: '1rem' }],
   sm:   ['0.875rem', { lineHeight: '1.25rem' }],
-  base: ['1rem',     { lineHeight: '1.6rem' }],
+  base: ['1rem',     { lineHeight: '1.65rem' }],
   lg:   ['1.125rem', { lineHeight: '1.75rem' }],
   xl:   ['1.25rem',  { lineHeight: '1.75rem' }],
-  '2xl': ['1.5rem',  { lineHeight: '2rem' }],
-  '3xl': ['1.875rem',{ lineHeight: '2.25rem' }],
-  '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-  '5xl': ['3rem',    { lineHeight: '1.1' }],
-  '6xl': ['3.75rem', { lineHeight: '1.05' }],
+  '2xl': ['1.5rem',  { lineHeight: '1.3' }],
+  '3xl': ['1.875rem',{ lineHeight: '1.2' }],
+  '4xl': ['2.25rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+  '5xl': ['3rem',    { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+  '6xl': ['3.75rem', { lineHeight: '1.02', letterSpacing: '-0.035em' }],
+  '7xl': ['4.5rem',  { lineHeight: '0.98', letterSpacing: '-0.04em' }],
 } as const
 
 export const borderRadius = {
@@ -61,9 +71,8 @@ export const borderRadius = {
 } as const
 
 export const spacing = {
-  // Section vertical padding — large and generous for premium feel
-  sectionY: '5rem',      // py-20 on mobile
-  sectionYLg: '7rem',   // md:py-28
+  sectionY: '4.5rem',     // py-18 on mobile
+  sectionYLg: '6.5rem',   // md:py-26
   containerPx: '1.25rem', // px-5 on mobile
   containerPxLg: '2rem',  // md:px-8
 } as const
@@ -72,13 +81,22 @@ export const spacing = {
 export const cssVars = {
   '--color-ink':          colors.ink,
   '--color-charcoal':     colors.charcoal,
-  '--color-paper':        colors.paper,
+  '--color-cream':        colors.cream,
+  '--color-cream-card':   colors.creamCard,
+  '--color-cream-darker': colors.creamDarker,
+  '--color-paper':        colors.cream,
   '--color-white':        colors.white,
-  '--color-signal':       colors.signal,
-  '--color-signal-hover': colors.signalHover,
-  '--color-signal-soft':  colors.signalSoft,
+  '--color-saffron':      colors.saffron,
+  '--color-saffron-hover':colors.saffronHover,
+  '--color-saffron-soft': colors.saffronSoft,
+  '--color-signal':       colors.saffron,
+  '--color-signal-hover': colors.saffronHover,
+  '--color-signal-soft':  colors.saffronSoft,
   '--color-muted':        colors.textMuted,
+  '--color-offwhite':     colors.textOffWhite,
+  '--color-muted-dark':   colors.textMutedDark,
   '--color-border':       colors.border,
   '--color-border-dark':  colors.borderDark,
+  '--font-display':       fonts.display,
   '--font-sans':          fonts.sans,
 } as const

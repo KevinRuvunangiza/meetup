@@ -38,8 +38,8 @@ interface CampaignCardData {
 export function Examples() {
   const { t } = useTranslation()
 
-  const creator = t('examples.creatorCard') as unknown as CreatorCardData
-  const campaign = t('examples.campaignCard') as unknown as CampaignCardData
+  const creator = (t('examples.creatorCard') as unknown as CreatorCardData) || {}
+  const campaign = (t('examples.campaignCard') as unknown as CampaignCardData) || {}
 
   return (
     <Section id="examples" dark>

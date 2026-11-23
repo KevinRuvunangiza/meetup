@@ -1,14 +1,17 @@
 {
   "nav": {
     "langToggle": "EN",
-    "cta": "Rejoindre la liste"
+    "cta": "Accès prioritaire"
   },
   "hero": {
-    "title": "Les marques et les créateurs de la RDC méritent mieux.",
-    "subtitle": "MEETUP connecte les marques sérieuses aux créateurs de contenu vérifiés — avec des termes clairs, des livrables précis et une relation de confiance depuis le début.",
+    "title": "Finis les deals par DM. Collaborez en toute confiance.",
+    "subtitle": "KOLAB connecte les marques sérieuses aux créateurs de contenu vérifiés en RDC — avec des accords clairs, des livrables précis et un cadre professionnel dès le premier jour.",
+    "trustTag1": "Identités vérifiées",
+    "trustTag2": "Termes écrits avant démarrage",
+    "trustTag3": "Kinshasa · Lubumbashi · Goma",
     "ctaBrand": "Je suis une marque",
     "ctaCreator": "Je suis un créateur",
-    "scroll": "Rejoindre la liste d'attente"
+    "scroll": "Rejoindre la liste prioritaire"
   },
   "problem": {
     "label": "Le problème",
@@ -28,7 +31,7 @@
         "body": "Sans plateforme neutre, chaque collaboration repart de zéro. Les relations professionnelles ont du mal à se construire sur une base solide."
       }
     ],
-    "closing": "MEETUP est conçu pour changer ça — pas avec des promesses vagues, mais avec un cadre concret, honnête et accessible."
+    "closing": "La plateforme est conçue pour changer ça — pas avec des promesses vagues, mais avec un cadre concret, honnête et accessible."
   },
   "howItWorks": {
     "label": "Comment ça marche",
@@ -332,15 +335,15 @@
       "title": "Vous êtes sur la liste !",
       "body": "Nous avons bien reçu votre inscription. Nous vous contacterons sur WhatsApp dès que nous sommes prêts à vous accueillir.",
       "share": "Partager sur WhatsApp",
-      "shareMessage": "Je viens de m'inscrire sur MEETUP — la plateforme qui connecte marques et créateurs en RDC. Inscris-toi ici : {url}"
+      "shareMessage": "Je viens de m'inscrire sur la liste prioritaire — découvrez la plateforme ici : {url}"
     }
   },
   "footer": {
-    "tagline": "Connecter les marques et les créateurs en RDC.",
+    "tagline": "Connecter les marques et les créateurs.",
     "contact": "Contact",
-    "contactEmail": "hello@meetup-drc.com",
+    "contactEmail": "contact@kolab.co",
     "privacy": "Vos données personnelles sont utilisées uniquement pour gérer la liste d'attente. Elles ne sont pas vendues ni partagées. Contactez-nous pour toute demande de suppression.",
-    "rights": "MEETUP. Tous droits réservés.",
-    "madeWith": "Fait avec soin pour la RDC."
+    "rights": "Tous droits réservés.",
+    "madeWith": "Fait avec soin."
   }
 }

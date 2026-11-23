@@ -6,23 +6,25 @@
  */
 
 export const siteConfig = {
-  /** Working name shown across the site */
-  name: 'MEETUP',
+  /**
+   * Working name shown across the site.
+   * Centralized here — change this one value when final brand name is selected.
+   */
+  name: 'KOLAB',
 
   /** Short tagline used in meta description */
-  tagline: 'La plateforme qui connecte les marques et les créateurs en RDC.',
+  tagline: 'La plateforme de référence qui connecte marques et créateurs.',
 
   /** Domain — update when you have a real domain */
-  url: 'https://meetup-waitlist.netlify.app',
+  url: 'https://kolab-waitlist.netlify.app',
 
-  /** Contact email shown in footer */
-  contactEmail: 'hello@meetup-drc.com',
+  /** Contact email shown in footer (no country suffix) */
+  contactEmail: 'contact@kolab.co',
 
   /** WhatsApp share prefill — {url} is replaced at runtime */
   whatsappShareTemplate:
-    "Je viens de m'inscrire sur MEETUP — la plateforme qui connecte marques et créateurs en RDC. Inscris-toi ici : {url}",
+    "Je viens de m'inscrire sur la liste prioritaire — découvrez la plateforme ici : {url}",
 
-  /** Google Apps Script endpoint — set after deploying Code.gs */
   /** Google Apps Script endpoint — set after deploying Code.gs */
   appsScriptUrl: import.meta.env.VITE_APPS_SCRIPT_URL ?? '',
 
@@ -39,9 +41,9 @@ export const siteConfig = {
 
   /** Open Graph / social preview */
   og: {
-    title: 'MEETUP — Marques & Créateurs, RDC',
+    title: 'KOLAB — Marques & Créateurs',
     description:
-      'La première plateforme de confiance qui met en relation les marques et les créateurs de contenu en République Démocratique du Congo.',
+      'La plateforme de référence qui connecte les marques sérieuses et les créateurs de contenu vérifiés.',
     image: '/og-image.png',
   },
 } as const

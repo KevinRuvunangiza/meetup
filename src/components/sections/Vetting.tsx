@@ -17,6 +17,7 @@ const icons = ['🪪', '🗂️', '📱']
 export function Vetting() {
   const { t } = useTranslation()
   const levels = t('vetting.levels') as unknown as VettingLevel[]
+  const list = Array.isArray(levels) ? levels : []
 
   return (
     <Section id="vetting" dark>
@@ -28,7 +29,7 @@ export function Vetting() {
       />
 
       <div className="grid gap-6 md:grid-cols-3 mb-10">
-        {levels.map((level, i) => (
+        {list.map((level, i) => (
           <motion.div
             key={level.heading}
             initial={{ opacity: 0, y: 20 }}

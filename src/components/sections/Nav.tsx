@@ -10,12 +10,17 @@ export function Nav() {
   const { t } = useTranslation()
 
   return (
-    <header className="sticky top-0 z-50 bg-paper/90 backdrop-blur-sm border-b border-border">
-      <div className="container-site flex items-center justify-between py-4 min-h-[64px]">
+    <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-border">
+      <div className="container-site flex items-center justify-between py-3.5 min-h-[64px]">
         {/* Wordmark */}
-        <span className="text-xl font-bold tracking-tight text-ink">
-          {siteConfig.name}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-black font-display tracking-tight text-ink">
+            {siteConfig.name}
+          </span>
+          <span className="hidden sm:inline-block rounded-full bg-saffron/30 border border-saffron/40 px-2 py-0.5 text-[10px] font-bold text-ink tracking-wide">
+            WAITLIST
+          </span>
+        </div>
 
         {/* Controls */}
         <div className="flex items-center gap-3">
@@ -24,7 +29,7 @@ export function Nav() {
             size="sm"
             variant="primary"
             onClick={() =>
-              document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
+              (document.getElementById('hero-quick-form') ?? document.getElementById('waitlist'))?.scrollIntoView({ behavior: 'smooth' })
             }
           >
             {t('nav.cta')}

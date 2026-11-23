@@ -19,6 +19,7 @@ export function CollabTypes() {
   const { t } = useTranslation()
 
   const items = t('collabTypes.items') as unknown as CollabItem[]
+  const list = Array.isArray(items) ? items : []
 
   return (
     <Section id="collab-types">
@@ -29,7 +30,7 @@ export function CollabTypes() {
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item, i) => {
+        {list.map((item, i) => {
           const isPaid = item.tag !== 'Non payé' && item.tag !== 'Unpaid'
 
           return (

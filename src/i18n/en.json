@@ -1,14 +1,17 @@
 {
   "nav": {
     "langToggle": "FR",
-    "cta": "Join the waitlist"
+    "cta": "Priority access"
   },
   "hero": {
-    "title": "Brands and creators in the DRC deserve better.",
-    "subtitle": "MEETUP connects serious brands with vetted content creators — with clear terms, defined deliverables, and a foundation of trust from day one.",
+    "title": "No more messy DMs. Collaborate with confidence.",
+    "subtitle": "KOLAB connects serious brands with vetted content creators in the DRC — with clear agreements, defined deliverables, and real professional respect from day one.",
+    "trustTag1": "Verified identities",
+    "trustTag2": "Written terms before launch",
+    "trustTag3": "Kinshasa · Lubumbashi · Goma",
     "ctaBrand": "I'm a brand",
     "ctaCreator": "I'm a creator",
-    "scroll": "Join the waitlist"
+    "scroll": "Join priority waitlist"
   },
   "problem": {
     "label": "The problem",
@@ -28,7 +31,7 @@
         "body": "Without a platform in the middle, every collaboration starts from scratch. Professional relationships are hard to build on shaky ground."
       }
     ],
-    "closing": "MEETUP is built to change that — not with vague promises, but with a concrete, honest, and accessible framework."
+    "closing": "The platform is built to change that — not with vague promises, but with a concrete, honest, and accessible framework."
   },
   "howItWorks": {
     "label": "How it works",
@@ -332,15 +335,15 @@
       "title": "You're on the list!",
       "body": "We've received your registration. We'll reach out on WhatsApp as soon as we're ready to welcome you.",
       "share": "Share on WhatsApp",
-      "shareMessage": "I just signed up for MEETUP — the platform connecting brands and creators in the DRC. Sign up here: {url}"
+      "shareMessage": "I just signed up for priority access — check out the platform here: {url}"
     }
   },
   "footer": {
-    "tagline": "Connecting brands and creators in the DRC.",
+    "tagline": "Connecting brands and creators.",
     "contact": "Contact",
-    "contactEmail": "hello@meetup-drc.com",
+    "contactEmail": "contact@kolab.co",
     "privacy": "Your personal data is used only to manage the waitlist. It is not sold or shared. Contact us to request deletion.",
-    "rights": "MEETUP. All rights reserved.",
-    "madeWith": "Made with care for the DRC."
+    "rights": "All rights reserved.",
+    "madeWith": "Crafted with care."
   }
 }

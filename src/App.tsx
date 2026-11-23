@@ -6,6 +6,7 @@ import type { Role } from '@/types/form'
 // Sections
 import { Nav } from '@/components/sections/Nav'
 import { Hero } from '@/components/sections/Hero'
+import { Feed } from '@/components/sections/Feed'
 import { Problem } from '@/components/sections/Problem'
 import { HowItWorks } from '@/components/sections/HowItWorks'
 import { CollabTypes } from '@/components/sections/CollabTypes'
@@ -40,7 +41,8 @@ export default function App() {
     <LanguageProvider>
       <Nav />
       <main>
-        <Hero onRoleSelect={setSelectedRole} />
+        <Hero onRoleSelect={setSelectedRole} initialRole={selectedRole} />
+        <Feed onJoinWaitlist={() => setSelectedRole('creator')} />
         <Problem />
         <HowItWorks />
         <CollabTypes />

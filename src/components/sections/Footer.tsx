@@ -43,8 +43,8 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 flex flex-col gap-1 md:flex-row md:justify-between">
-          <p className="text-xs text-white/30">
-            © {year} {t('footer.rights')}
+          <p className="text-xs text-white/40">
+            © {year} {siteConfig.name}. {t('footer.rights')}
           </p>
           <p className="text-xs text-white/30">{t('footer.madeWith')}</p>
         </div>

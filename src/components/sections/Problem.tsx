@@ -16,13 +16,7 @@ export function Problem() {
   }>
 
   // Pull array from translation — safely
-  const rawItems = (() => {
-    try {
-      return JSON.parse(JSON.stringify(items)) as Array<{ heading: string; body: string }>
-    } catch {
-      return []
-    }
-  })()
+  const rawItems = Array.isArray(items) ? items : []
 
   return (
     <Section id="problem">

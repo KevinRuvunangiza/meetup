@@ -50,12 +50,12 @@ interface ExampleCreatorCardProps {
 
 export function ExampleCreatorCard({
   badge,
-  name,
+  name = '',
   type,
-  niches,
+  niches = [],
   bio,
-  platforms,
-  verified,
+  platforms = [],
+  verified = [],
 }: ExampleCreatorCardProps) {
   return (
     <Card accent>
@@ -71,7 +71,7 @@ export function ExampleCreatorCard({
             aria-hidden="true"
             className="h-14 w-14 rounded-full bg-ink flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
           >
-            {name.charAt(0)}
+            {name?.charAt(0) ?? ''}
           </div>
           <div>
             <p className="font-bold text-lg text-ink">{name}</p>
@@ -81,7 +81,7 @@ export function ExampleCreatorCard({
 
         {/* Niches */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {niches.map((n) => (
+          {niches?.map((n) => (
             <span
               key={n}
               className="rounded-full bg-paper border border-border px-3 py-1 text-xs font-medium text-ink"
@@ -96,7 +96,7 @@ export function ExampleCreatorCard({
 
         {/* Platforms */}
         <div className="flex flex-col gap-1 mb-4">
-          {platforms.map((p) => (
+          {platforms?.map((p) => (
             <div key={p.name} className="flex justify-between text-sm">
               <span className="font-medium text-ink">{p.name}</span>
               <span className="text-muted">{p.followers}</span>
@@ -106,7 +106,7 @@ export function ExampleCreatorCard({
 
         {/* Verification levels */}
         <div className="border-t border-border pt-4 flex flex-col gap-1">
-          {verified.map((v) => (
+          {verified?.map((v) => (
             <div key={v} className="flex items-center gap-2 text-sm text-ink">
               <span className="text-signal font-bold" aria-hidden="true">✓</span>
               {v}

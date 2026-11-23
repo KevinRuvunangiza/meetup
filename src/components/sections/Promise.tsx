@@ -15,6 +15,7 @@ interface PromiseItem {
 export function Promise() {
   const { t } = useTranslation()
   const items = t('promise.items') as unknown as PromiseItem[]
+  const list = Array.isArray(items) ? items : []
 
   return (
     <Section id="promise">
@@ -24,7 +25,7 @@ export function Promise() {
       />
 
       <div className="grid gap-6 md:grid-cols-2">
-        {items.map((item, i) => (
+        {list.map((item, i) => (
           <motion.div
             key={item.heading}
             initial={{ opacity: 0, y: 16 }}

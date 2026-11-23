@@ -154,3 +154,72 @@ The goal: you understand **what** was built, **why**, and **what alternatives we
 **Why:** Zero JavaScript, fully keyboard-navigable, accessible to screen readers, works on the slowest connections, and renders correctly even if JavaScript fails. We style it with Tailwind's `group-open:` modifier.
 
 **Tradeoff:** No animated height transition (browsers don't animate `height: auto`). Acceptable for a FAQ — the content appears immediately on click, which is fast and clear.
+
+---
+
+## 14. Redesign Direction: Editorial Startup Aesthetic & Hero Architecture
+
+**Decision:** Transform the waitlist from a generic black-and-white template into a confident, premium, editorial startup experience.
+
+### Key Architectural Choices:
+1. **Typography — Bricolage Grotesque (Display) & Hanken Grotesk (Body)**
+   - *Why:* Bricolage Grotesque has bold, distinctive proportions and personality without looking quirky. Hanken Grotesk provides neutral, highly legible body copy (16–18px). Both are loaded as modern variable fonts with `font-display: swap` and `font-size-adjust: from-font` for visual stability without layout shifts.
+   - *Alternatives rejected:* Default Inter (looks like an unbranded SaaS template), serif fonts (too traditional for a creator tech platform).
+
+2. **Color Palette — Cream, Ink, and Saffron**
+   - *Surface:* Cream (`#F4EFE6`) replaces sterile `#FFFFFF` as the foundational canvas, giving an tactile, editorial tone.
+   - *Dark drama:* Deep Ink (`#0E0E0E`) is used selectively for cards, navigation highlights, and high-impact areas with off-white text (`#E8E4DD`), eliminating low-contrast `gray-500` illegibility.
+   - *Accent:* Saffron (`#F2A900`, hover `#D99700`) covers ~5% of the visual space (CTAs, verified badges). Contrast rule enforced: text placed on Saffron is strictly `#0E0E0E`.
+
+3. **Product Visual & Abstract Duotone Portraits (`src/data/creatorCards.ts`)**
+   - *Why:* A waitlist must show what the actual platform experience looks like. We built vertical creator cards displaying platform stats, verified status chips, niches, and sample deliverables.
+   - *Honesty constraint:* Zero fake AI people or stock faces. Until verified creators provide written consent, cards display abstract duotone architectural/geometric motifs. Swapping to real photos requires editing only `photoUrl` in `src/data/creatorCards.ts`.
+
+4. **Above-the-Fold Form Integration (`HeroWaitlistForm.tsx`)**
+   - *Why:* Burying the form at the bottom of a long scroll severely hurts conversion. The Hero now features an instant role toggle (Brand vs. Creator) with 3 essential fields and an optional expandable drawer for deeper information.
+   - *Motion:* Smooth tab switching with layout animations (`layoutId="heroFormRolePill"`), animated validation, and instant feedback.
+
+5. **Motion Budget & Low-End Android Performance**
+   - *Engine:* `LazyMotion` with `domAnimation` from `motion/react` reduces initial bundle weight.
+   - *Compositor constraints:* Only `transform` and `opacity` are animated to ensure 60fps on mobile.
+   - *Accessibility:* Full `prefers-reduced-motion` compliance — all float and tilt animations collapse to elegant static offsets when requested.
+
+6. **Iconography — Native Thin-Stroke SVGs**
+   - *Decision:* Replaced all emojis and heavy icon libraries with a dedicated set of 1.75px stroke SVG components in `src/components/ui/Icons.tsx`.
+
+### How to Test:
+- **Hero & Form:** Visit `http://localhost:5173/`. Test toggling between *Je suis une marque* and *Je suis un créateur*. Submit with invalid or valid details and verify immediate feedback.
+- **Card Collage:** Hover over or tap the creator cards in desktop/tablet view to observe gentle floating and interactive tilt responses.
+- **Mobile Sticky CTA:** Shrink browser to mobile width (< 768px), scroll down past the hero form, and observe the sticky "Rejoindre la liste" bar appear at the bottom. Tapping it smoothly scrolls back up to the form.
+- **Reduced Motion:** Enable "Reduce Motion" in system settings and confirm animations stop smoothly.
+
+---
+
+## 15. Brand Name Decoupling & Cleanup
+
+**Decision:** Completely decouple the product from any hardcoded brand name or country-specific suffix.
+- The working name `KOLAB` lives solely in `src/config/site.config.ts` (`siteConfig.name`).
+- All metadata, open graph tags, social share strings, and footers reference `siteConfig.name`.
+- Contact email (`contact@kolab.co`) and URL placeholder (`https://kolab-waitlist.netlify.app`) use generic top-level domains with zero country tags (no `-rdc`).
+
+---
+
+## 16. Iconography: Phosphor Icons (`react-icons/pi`)
+
+**Decision:** Adopted Phosphor Icons (`react-icons/pi`) across the entire codebase.
+- *Why:* Phosphor offers a cohesive 1.75px stroke design system with excellent visual balance for editorial UI.
+- *Bundle safety:* All icons are imported individually (e.g. `import { PiSealCheck } from 'react-icons/pi'`) so tree-shaking discards unused icons.
+- *No emojis:* Zero emojis across the site, elevating the tone from hobbyist to serious venture.
+
+---
+
+## 17. Feed Section & Campaign/Creator Listings (`src/data/examples.ts`)
+
+**Decision:** Implemented a realistic platform preview featuring authentic-feeling listings.
+- **`CampaignCard`:** 16:10 cover image ratio with explicit `width={640}` and `height={400}` to prevent layout shifts (CLS), brand monogram avatar, collaboration type badge (UGC, Influence, Hybride, Gifting), status pill, deliverables chips, budget range, and an *Aperçu* button.
+- **`CreatorCard`:** 4:5 portrait ratio with explicit `width={400}` and `height={500}`, city pill, verified chip, niche chips, and platform follower counts.
+- **Illustration rule:** All listings use fictional brands and abstract vector duotones (no faces, no fake logos). Replaceable in a single file (`src/data/examples.ts`). Marked with a discreet line: *"Aperçu illustratif, aucune marque réelle représentée"*.
+- **Mobile Swipeable Carousel:** Native CSS scroll-snap (`scroll-snap-type: x mandatory`, `overscroll-behavior-x: contain`) ensures smooth touch interaction on mobile without third-party carousel library bloat.
+- **`CampaignPreviewModal`:** Native accessible overlay with light dismiss, escape key handling, overscroll containment, and direct waitlist conversion flow.
+
+

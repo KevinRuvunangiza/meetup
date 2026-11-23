@@ -34,6 +34,7 @@ function FaqItem({ q, a }: FaqItem) {
 export function FAQ() {
   const { t } = useTranslation()
   const items = t('faq.items') as unknown as FaqItem[]
+  const list = Array.isArray(items) ? items : []
 
   return (
     <Section id="faq">
@@ -43,7 +44,7 @@ export function FAQ() {
       />
 
       <div className="max-w-2xl rounded-xl border border-border bg-white divide-y divide-border overflow-hidden">
-        {items.map((item) => (
+        {list.map((item) => (
           <FaqItem key={item.q} q={item.q} a={item.a} />
         ))}
       </div>

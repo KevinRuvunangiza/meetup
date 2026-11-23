@@ -21,7 +21,7 @@ import en from '@/i18n/en.json'
  * Usage:
  *   const { t, lang, setLang } = useTranslation()
  *   t('hero.title')           → string
- *   t('hero.subtitle', { name: 'MEETUP' }) → interpolated string
+ *   t('hero.subtitle', { name: 'KOLAB' }) → interpolated string
  */
 
 // Accept any string key — the function returns the key itself if not found,
@@ -32,14 +32,14 @@ export type TranslationKey = string
 const catalogs: Record<Language, Record<string, unknown>> = { fr, en }
 
 /** Resolve a dot-notation key against a nested object */
-function resolve(obj: Record<string, unknown>, key: string): string {
+function resolve(obj: Record<string, unknown>, key: string): unknown {
   const parts = key.split('.')
   let current: unknown = obj
   for (const part of parts) {
     if (current == null || typeof current !== 'object') return key
     current = (current as Record<string, unknown>)[part]
   }
-  return typeof current === 'string' ? current : key
+  return current !== undefined ? current : key
 }
 
 /** Replace {placeholder} tokens in a string */
@@ -53,7 +53,7 @@ function interpolate(str: string, vars?: Record<string, string>): string {
 interface I18nContextValue {
   lang: Language
   setLang: (l: Language) => void
-  t: (key: TranslationKey, vars?: Record<string, string>) => string
+  t: <T = string>(key: TranslationKey, vars?: Record<string, string>) => T
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null)
@@ -68,10 +68,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const t = useCallback(
-    (key: TranslationKey, vars?: Record<string, string>): string => {
+    <T = string>(key: TranslationKey, vars?: Record<string, string>): T => {
       const catalog = catalogs[lang] as Record<string, unknown>
-      const str = resolve(catalog, key)
-      return interpolate(str, vars)
+      const val = resolve(catalog, key)
+      if (typeof val === 'string') {
+        return interpolate(val, vars) as unknown as T
+      }
+      return val as T
     },
     [lang],
   )
@@ -83,6 +86,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTranslation(): I18nContextValue {
   const ctx = useContext(I18nContext)
   if (!ctx) throw new Error('useTranslation must be used inside LanguageProvider')

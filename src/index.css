@@ -24,13 +24,19 @@
   }
 
   body {
-    background-color: var(--color-paper);
+    background-color: var(--color-cream);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    font-size-adjust: from-font;
     /* Improves text rendering on Android/iOS */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.6;
+    line-height: 1.65;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
   }
 
   /* Minimum 44×44 px tap targets on interactive elements */

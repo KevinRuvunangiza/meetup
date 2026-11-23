@@ -14,9 +14,10 @@ interface Step {
 }
 
 function StepList({ steps, light }: { steps: Step[]; light: boolean }) {
+  const list = Array.isArray(steps) ? steps : []
   return (
     <ol className="flex flex-col gap-8">
-      {steps.map((s, i) => (
+      {list.map((s, i) => (
         <motion.li
           key={s.step}
           initial={{ opacity: 0, x: -12 }}
