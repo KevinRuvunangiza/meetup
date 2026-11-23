@@ -1,131 +1,52 @@
 /**
- * MEETUP WAITLIST — Google Apps Script
+ * KOLAB WAITLIST — Google Apps Script (Production Ready)
  * ─────────────────────────────────────────────────────────────────────────────
- * HOW TO DEPLOY (step by step):
+ * CRITICAL DEPLOYMENT SETTINGS (To prevent CORS / 401 errors):
  *
- * 1. Go to https://sheets.google.com and create a new spreadsheet.
- *    Name it "MEETUP Waitlist".
- *
- * 2. At the bottom, rename the first sheet tab to "Brands".
- *    Click the + button and name the second tab "Creators".
- *
- * 3. In the spreadsheet, click Extensions → Apps Script.
- *    A new tab opens with a code editor.
- *
- * 4. Delete all existing code and paste the entire contents of this file.
- *
- * 5. At the top of the editor, find the constant SPREADSHEET_ID below.
- *    Replace 'YOUR_SPREADSHEET_ID_HERE' with the ID from your spreadsheet URL.
- *    The URL looks like:
- *      https://docs.google.com/spreadsheets/d/1_ptRYh9P7VtsFYjijv2YgwT8xxXN-qtit6FNuhvAiaQ/edit
- *    Copy the XXXXXXXXXXXXXXXX part.
- *
- * 6. Click File → Save. Name the project "MEETUP Waitlist".
- *
- * 7. Click Deploy → New deployment.
- *    - Type: Web app
- *    - Execute as: Me (your Google account)
- *    - Who has access: Anyone
- *    Click Deploy.
- *
- * 8. Google will ask you to authorize the script.
- *    Click "Review permissions" → choose your account → "Advanced" → "Go to MEETUP Waitlist (unsafe)"
- *    → Allow.
- *    (The "unsafe" warning appears because this is a new, unverified script.
- *     It is YOUR script — this is normal for self-deployed scripts.)
- *
- * 9. Copy the Web app URL that appears.
- *    It looks like: https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
- *
- * 10. In your project, create a file called .env.local (copy from .env.example):
- *     VITE_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
- *
- * 11. On Netlify, go to Site configuration → Environment variables and add:
- *     Key:   VITE_APPS_SCRIPT_URL
- *     Value: https://script.google.com/macros/s/AKfycbzpIwuESc8A_MJE7GqPOA0qQ02-ryREppbimVPIxDNCJHjGSJ7OH7Kj7tiZEN4BLxdr/exec
- *
- * 12. To test: submit the form on your site. Check the spreadsheet.
- *     If nothing appears, open the Apps Script editor → Executions tab
- *     to see logs and errors.
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * KNOWN WEAKNESSES (documented honestly):
- *
- * • The endpoint URL is public. Anyone who finds it can POST fake data.
- *   Mitigation: honeypot field on the frontend (bots fill it → ignored server-side),
- *   rate limiting is not possible in Apps Script.
- *
- * • No authentication. This is intentional for a waitlist — the bar to sign up
- *   should be low. For sensitive data, use Supabase + Row Level Security.
- *
- * • Apps Script has a 6-minute execution limit and daily quotas
- *   (20,000 reads/day on free tier). For a waitlist this is not a concern.
- *
- * • Each POST triggers a new Apps Script instance. If you get 50 submissions
- *   in one second, they may queue. Again, fine for a waitlist.
- *
- * FUTURE MIGRATION PATH:
- *   Replace this with a Supabase table + Edge Function:
- *   - Better performance, real duplicate checking, rate limiting
- *   - Row Level Security for data privacy
- *   - Supabase dashboard for filtering, exporting
- *   - Migrate by changing siteConfig.appsScriptUrl to point to the new endpoint
+ * 1. Open this script in https://script.google.com or via Google Sheets (Extensions > Apps Script).
+ * 2. Click Deploy (Déployer) at top right → Manage deployments (Gérer les déploiements).
+ * 3. Click the Pencil icon (Edit / Modifier):
+ *    • Version: Select "New version" (Nouvelle version) — ALWAYS create a new version when updating!
+ *    • Execute as (Exécuter en tant que): Select "Me" (Moi - your email).
+ *    • Who has access (Qui a accès): MUST BE "Anyone" (Tout le monde / Même anonyme).
+ *      ⚠️ IF THIS IS "Only myself" OR "Anyone with Google account", GOOGLE REDIRECTS TO SIGN-IN
+ *      WHICH CAUSES THE BROWSER CORS ERROR!
+ * 4. Click Deploy (Déployer) and authorize permissions.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-// !! CHANGE THIS to your spreadsheet ID !!
-const SPREADSHEET_ID = "1_ptRYh9P7VtsFYjijv2YgwT8xxXN-qtit6FNuhvAiaQ";
+const SPREADSHEET_ID = '1_ptRYh9P7VtsFYjijv2YgwT8xxXN-qtit6FNuhvAiaQ';
 
-// Sheet tab names (must match what you created in step 2)
-const BRANDS_SHEET = "Brands";
-const CREATORS_SHEET = "Creators";
+// Sheet tab names (automatically created if they don't exist)
+const BRANDS_SHEET = 'Brands';
+const CREATORS_SHEET = 'Creators';
 
 // Column headers for each sheet
 const BRAND_HEADERS = [
-  "Timestamp",
-  "Source",
-  "Full Name",
-  "WhatsApp",
-  "Email",
-  "City",
-  "Business Name",
-  "Sector",
-  "Creator Need",
-  "Budget",
-  "Worked Before",
-  "Website/Instagram",
+  'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
+  'Business Name', 'Sector', 'Creator Need', 'Budget', 'Worked Before',
+  'Website/Instagram'
 ];
 
 const CREATOR_HEADERS = [
-  "Timestamp",
-  "Source",
-  "Full Name",
-  "WhatsApp",
-  "Email",
-  "City",
-  "Creator Name",
-  "Creator Type",
-  "Niches",
-  "Instagram Handle",
-  "Instagram Followers",
-  "TikTok Handle",
-  "TikTok Followers",
-  "YouTube Handle",
-  "YouTube Followers",
-  "Portfolio Link",
-  "Paid Before",
-  "Rate Range",
+  'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
+  'Creator Name', 'Creator Type', 'Niches', 'Instagram Handle', 'Instagram Followers',
+  'TikTok Handle', 'TikTok Followers', 'YouTube Handle', 'YouTube Followers',
+  'Portfolio Link', 'Paid Before', 'Rate Range'
 ];
 
 /**
  * Handle POST requests from the frontend.
- * Apps Script receives all requests via doPost().
  */
 function doPost(e) {
   try {
-    // Parse body
-    const raw = e.postData ? e.postData.contents : "{}";
-    const payload = JSON.parse(raw);
+    const raw = e && e.postData ? e.postData.contents : '{}';
+    let payload;
+    try {
+      payload = JSON.parse(raw);
+    } catch (parseErr) {
+      return jsonResponse({ success: false, message: 'Invalid JSON payload.' });
+    }
 
     // Server-side validation
     const validation = validatePayload(payload);
@@ -135,35 +56,45 @@ function doPost(e) {
 
     const data = payload.data;
 
-    // Honeypot check — if 'honeypot' field is not empty, silently accept
-    // (don't tell bots we detected them)
-    if (data.honeypot && data.honeypot.trim() !== "") {
-      return jsonResponse({ success: true, message: "Registered." });
+    // Honeypot anti-bot check
+    if (data.honeypot && String(data.honeypot).trim() !== '') {
+      return jsonResponse({ success: true, message: 'Registered.' });
     }
 
     // Open spreadsheet
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-    if (data.role === "brand") {
+    if (data.role === 'brand') {
       return handleBrand(ss, data, payload.timestamp);
-    } else if (data.role === "creator") {
+    } else if (data.role === 'creator') {
       return handleCreator(ss, data, payload.timestamp);
     } else {
-      return jsonResponse({ success: false, message: "Invalid role." });
+      return jsonResponse({ success: false, message: 'Invalid role specified.' });
     }
+
   } catch (err) {
-    console.error("doPost error:", err);
-    return jsonResponse({ success: false, message: "Server error." });
+    console.error('doPost error:', err);
+    return jsonResponse({ success: false, message: 'Server error: ' + err.toString() });
   }
 }
 
 /**
- * Handle GET requests (useful for testing that the endpoint is reachable).
+ * Handle GET requests for testing connectivity.
  */
 function doGet() {
-  return ContentService.createTextOutput(
-    JSON.stringify({ status: "MEETUP Waitlist API is running." }),
-  ).setMimeType(ContentService.MimeType.JSON);
+  return jsonResponse({
+    status: 'ok',
+    message: 'Waitlist API is live and accepting submissions.',
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Handle preflight OPTIONS requests if triggered by any client.
+ */
+function doOptions() {
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 // ─── Brand handler ────────────────────────────────────────────────────────────
@@ -171,36 +102,31 @@ function doGet() {
 function handleBrand(ss, data, timestamp) {
   const sheet = getOrCreateSheet(ss, BRANDS_SHEET, BRAND_HEADERS);
 
-  // Duplicate check by WhatsApp number
+  // Duplicate check by WhatsApp number (column 4 = WhatsApp, 1-indexed)
   if (isDuplicate(sheet, data.whatsapp, 4)) {
-    // column 4 = WhatsApp (1-indexed)
-    return jsonResponse({
-      success: false,
-      duplicate: true,
-      message: "Already registered.",
-    });
+    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
   }
 
   const serverTimestamp = new Date().toISOString();
   const row = [
-    serverTimestamp, // Timestamp (server-generated)
-    data.source || "direct", // Source/UTM
-    sanitize(data.fullName), // Full Name
-    sanitize(data.whatsapp), // WhatsApp
-    sanitize(data.email || ""), // Email
-    sanitize(data.city), // City
-    sanitize(data.businessName || ""), // Business Name
-    sanitize(data.sector || ""), // Sector
-    sanitize(data.creatorNeed || ""), // Creator Need
-    sanitize(data.budget || ""), // Budget
-    sanitize(data.workedBefore || ""), // Worked Before
-    sanitize(data.websiteOrInsta || ""), // Website/Instagram
+    serverTimestamp,
+    data.source || 'direct',
+    sanitize(data.fullName),
+    sanitize(data.whatsapp),
+    sanitize(data.email || ''),
+    sanitize(data.city || 'Kinshasa'),
+    sanitize(data.businessName || data.fullName || ''),
+    sanitize(data.sector || ''),
+    sanitize(data.creatorNeed || ''),
+    sanitize(data.budget || ''),
+    sanitize(data.workedBefore || ''),
+    sanitize(data.websiteOrInsta || ''),
   ];
 
   sheet.appendRow(row);
-  console.log("Brand registered:", data.whatsapp, timestamp);
+  console.log('Brand registered:', data.whatsapp, timestamp);
 
-  return jsonResponse({ success: true, message: "Brand registered." });
+  return jsonResponse({ success: true, message: 'Brand registered successfully.' });
 }
 
 // ─── Creator handler ──────────────────────────────────────────────────────────
@@ -210,69 +136,56 @@ function handleCreator(ss, data, timestamp) {
 
   // Duplicate check by WhatsApp number
   if (isDuplicate(sheet, data.whatsapp, 4)) {
-    return jsonResponse({
-      success: false,
-      duplicate: true,
-      message: "Already registered.",
-    });
+    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
   }
 
   const serverTimestamp = new Date().toISOString();
-  const niches = Array.isArray(data.niches) ? data.niches.join(", ") : "";
+  const niches = Array.isArray(data.niches) ? data.niches.join(', ') : (data.niches || '');
 
   const row = [
     serverTimestamp,
-    data.source || "direct",
+    data.source || 'direct',
     sanitize(data.fullName),
     sanitize(data.whatsapp),
-    sanitize(data.email || ""),
-    sanitize(data.city),
-    sanitize(data.creatorName || ""),
-    sanitize(data.creatorType || ""),
+    sanitize(data.email || ''),
+    sanitize(data.city || 'Kinshasa'),
+    sanitize(data.creatorName || data.fullName || ''),
+    sanitize(data.creatorType || ''),
     sanitize(niches),
-    sanitize(data.instagramHandle || ""),
-    sanitize(data.instagramFollowers || ""),
-    sanitize(data.tiktokHandle || ""),
-    sanitize(data.tiktokFollowers || ""),
-    sanitize(data.youtubeHandle || ""),
-    sanitize(data.youtubeFollowers || ""),
-    sanitize(data.portfolioLink || ""),
-    sanitize(data.paidBefore || ""),
-    sanitize(data.rateRange || ""),
+    sanitize(data.instagramHandle || ''),
+    sanitize(data.instagramFollowers || ''),
+    sanitize(data.tiktokHandle || ''),
+    sanitize(data.tiktokFollowers || ''),
+    sanitize(data.youtubeHandle || ''),
+    sanitize(data.youtubeFollowers || ''),
+    sanitize(data.portfolioLink || ''),
+    sanitize(data.paidBefore || ''),
+    sanitize(data.rateRange || ''),
   ];
 
   sheet.appendRow(row);
-  console.log("Creator registered:", data.whatsapp, timestamp);
+  console.log('Creator registered:', data.whatsapp, timestamp);
 
-  return jsonResponse({ success: true, message: "Creator registered." });
+  return jsonResponse({ success: true, message: 'Creator registered successfully.' });
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Get a sheet by name, or create it with headers if it doesn't exist.
- */
 function getOrCreateSheet(ss, name, headers) {
   let sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
   }
-  // Add headers if the sheet is empty
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
-    // Bold the header row
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   }
   return sheet;
 }
 
-/**
- * Check if a value already exists in a given column (1-indexed).
- * Used for WhatsApp duplicate detection.
- */
 function isDuplicate(sheet, value, columnIndex) {
   const lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return false; // Only headers, no data yet
+  if (lastRow <= 1) return false;
 
   const range = sheet.getRange(2, columnIndex, lastRow - 1, 1);
   const values = range.getValues();
@@ -281,58 +194,53 @@ function isDuplicate(sheet, value, columnIndex) {
   return values.some(([cell]) => normalisePhone(String(cell)) === normalised);
 }
 
-/**
- * Normalise a phone number for comparison:
- * strip spaces, dashes, parentheses.
- */
 function normalisePhone(phone) {
-  return phone.replace(/[\s\-().]/g, "");
+  if (!phone) return '';
+  return String(phone).replace(/[\s\-().]/g, '');
 }
 
-/**
- * Remove any formula injection attempts (cells starting with = + - @).
- */
 function sanitize(value) {
+  if (value === null || value === undefined) return '';
   const str = String(value).trim();
-  if (["+", "-", "=", "@", "\t", "\r"].some((ch) => str.startsWith(ch))) {
-    return "'" + str; // Prefix with apostrophe to treat as text in Sheets
+  if (['+', '-', '=', '@', '\t', '\r'].some(ch => str.startsWith(ch))) {
+    return "'" + str; // Treat as text in Sheets
   }
   return str;
 }
 
-/**
- * Server-side validation — minimal but explicit.
- */
 function validatePayload(payload) {
-  if (!payload || typeof payload !== "object") {
-    return { ok: false, message: "Invalid payload." };
+  if (!payload || typeof payload !== 'object') {
+    return { ok: false, message: 'Invalid payload format.' };
   }
 
   const data = payload.data;
-  if (!data) return { ok: false, message: "Missing data." };
-
-  if (!["brand", "creator"].includes(data.role)) {
-    return { ok: false, message: "Invalid role." };
+  if (!data || typeof data !== 'object') {
+    return { ok: false, message: 'Missing form data.' };
   }
 
-  if (!data.fullName || !data.whatsapp || !data.city) {
-    return { ok: false, message: "Missing required fields." };
+  if (!['brand', 'creator'].includes(data.role)) {
+    return { ok: false, message: 'Invalid role.' };
   }
 
-  // Basic phone format: starts with +, 7–15 digits
-  if (!/^\+\d{7,15}$/.test(data.whatsapp.replace(/\s/g, ""))) {
-    return { ok: false, message: "Invalid WhatsApp number." };
+  if (!data.fullName || !String(data.fullName).trim()) {
+    return { ok: false, message: 'Le nom est requis.' };
+  }
+
+  const phone = normalisePhone(data.whatsapp);
+  if (!phone) {
+    return { ok: false, message: 'Le numéro WhatsApp est requis.' };
+  }
+
+  // Flexible phone format: accepts +243..., 243..., 08... (7 to 15 digits)
+  if (!/^\+?[0-9]{7,15}$/.test(phone)) {
+    return { ok: false, message: 'Numéro WhatsApp invalide.' };
   }
 
   return { ok: true };
 }
 
-/**
- * Return a CORS-safe JSON response.
- * Apps Script web apps need CORS headers for cross-origin fetch().
- */
 function jsonResponse(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
-    ContentService.MimeType.JSON,
-  );
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }

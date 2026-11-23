@@ -25,13 +25,14 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    # Content Security Policy — allow self + Google Apps Script for form submission
+    # Content Security Policy — allow self + Google Fonts + Google Apps Script
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self' 'unsafe-inline';
-      style-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com data:;
       connect-src 'self' https://script.google.com https://script.googleusercontent.com;
-      img-src 'self' data:;
+      img-src 'self' data: blob: https:;
       frame-ancestors 'none'
     """
 
