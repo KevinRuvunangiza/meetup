@@ -5,345 +5,317 @@
   },
   "hero": {
     "title": "Finis les deals par DM. Collaborez en toute confiance.",
-    "subtitle": "KOLAB connecte les marques sérieuses aux créateurs de contenu vérifiés en RDC — avec des accords clairs, des livrables précis et un cadre professionnel dès le premier jour.",
+    "subtitle": "Mosala met les marques et les créateurs d'accord, par écrit, avec une équipe qui vérifie chaque profil.",
     "trustTag1": "Identités vérifiées",
     "trustTag2": "Termes écrits avant démarrage",
-    "trustTag3": "Kinshasa · Lubumbashi · Goma",
+    "trustTag3": "Vérification humaine · Kinshasa",
     "ctaBrand": "Je suis une marque",
     "ctaCreator": "Je suis un créateur",
-    "scroll": "Rejoindre la liste prioritaire"
+    "scroll": "Rejoindre la liste prioritaire",
+    "meaningNote": "Mosala, ça veut dire travail en lingala."
   },
-  "problem": {
-    "label": "Le problème",
-    "title": "Trouver un créateur ou une marque aujourd'hui, c'est compliqué.",
-    "intro": "En RDC, les collaborations entre marques et créateurs reposent encore trop souvent sur des messages privés, des groupes WhatsApp et le bouche-à-oreille. Ça fonctionne parfois — mais ça crée aussi beaucoup de problèmes.",
-    "items": [
-      {
-        "heading": "Pas de vérification",
-        "body": "Les marques ne peuvent pas savoir si un créateur est sérieux. Les créateurs ne savent pas si une marque va vraiment payer."
-      },
-      {
-        "heading": "Pas d'accord clair",
-        "body": "Les livrables, les délais et les droits d'utilisation sont rarement écrits. Les malentendus sont fréquents, et difficiles à résoudre."
-      },
-      {
-        "heading": "Pas de cadre de confiance",
-        "body": "Sans plateforme neutre, chaque collaboration repart de zéro. Les relations professionnelles ont du mal à se construire sur une base solide."
-      }
-    ],
-    "closing": "La plateforme est conçue pour changer ça — pas avec des promesses vagues, mais avec un cadre concret, honnête et accessible."
-  },
-  "howItWorks": {
-    "label": "Comment ça marche",
-    "brandTitle": "Pour les marques",
-    "creatorTitle": "Pour les créateurs",
+  "audienceBenefits": {
+    "label": "Pour qui ?",
+    "title": "Un cadre adapté à votre réalité.",
+    "tabBrand": "Pour les Marques",
+    "tabCreator": "Pour les Créateurs",
     "brand": [
       {
-        "step": "1",
-        "heading": "Inscrivez votre marque",
-        "body": "Dites-nous ce que vous cherchez : votre secteur, votre budget indicatif et le type de contenu dont vous avez besoin. Nous étudions votre profil avant de vous mettre en relation."
+        "title": "Publiez, recevez des candidatures ciblées.",
+        "desc": "Définissez votre besoin et votre budget. Seuls les créateurs vérifiés postulent à vos campagnes."
       },
       {
-        "step": "2",
-        "heading": "Recevez des suggestions ciblées",
-        "body": "Nous vous proposons des créateurs correspondant à votre secteur et à votre objectif. Vous examinez leurs profils et décidez avec qui avancer."
+        "title": "Des règles écrites avant de commencer.",
+        "desc": "Livrables, délais, budget, droits d'usage : tout est consigné dans un accord clair."
       },
       {
-        "step": "3",
-        "heading": "Collaborez avec des termes clairs",
-        "body": "Livrables, délais, droits d'utilisation et paiement — tout est défini avant le début du travail. Pas de surprises, pas de malentendus."
+        "title": "Moins de messages, plus de résultats.",
+        "desc": "Un seul endroit pour briefer, valider et faire le suivi de vos collaborations."
       }
     ],
     "creator": [
       {
+        "title": "Des vraies marques, des budgets affichés.",
+        "desc": "Vous savez ce qu'on vous propose et le budget prévu avant de vous engager."
+      },
+      {
+        "title": "Vos droits, par écrit.",
+        "desc": "Durée d'utilisation, pub ou organique, exclusivité : vous savez précisément ce que vous accordez."
+      },
+      {
+        "title": "Le paiement est dans l'accord.",
+        "desc": "Il est prévu et consigné avant le début du travail. On vous dit précisément comment et quand."
+      }
+    ]
+  },
+  "theFramework": {
+    "label": "Le cadre légal & opérationnel",
+    "title": "Chaque collaboration résumée en une page claire.",
+    "subtitle": "Avant le premier tournage ou la publication, tout le monde est d'accord sur ce qui compte.",
+    "sampleBadge": "Exemple d'accord type",
+    "details": [
+      { "label": "Livrables précis", "value": "2 Reels Instagram (format 9:16) + 3 photos brutes" },
+      { "label": "Droits d'utilisation", "value": "Réseaux sociaux organiques · 3 mois · RDC" },
+      { "label": "Exclusivité sectorielle", "value": "Aucun concurrent direct pendant 30 jours" },
+      { "label": "Allers-retours", "value": "1 tour de retouches mineures inclus" },
+      { "label": "Modalités de règlement", "value": "Acompte à la validation du brief, solde à livraison" }
+    ],
+    "note": "Aucun flou juridique, aucun malentendu au moment de régler."
+  },
+  "feed": {
+    "label": "Aperçu de la plateforme",
+    "title": "Des campagnes concrètes et des créateurs vérifiés.",
+    "subtitle": "Voici à quoi ressemblent les opportunités et les profils sur Mosala.",
+    "disclaimer": "Aperçu illustratif — aucune marque réelle représentée.",
+    "filterAll": "Tout",
+    "previewButton": "Aperçu",
+    "modalTitle": "Cette opportunité est un aperçu",
+    "modalBody": "Mosala ouvre progressivement ses portes. Inscrivez-vous sur la liste prioritaire pour postuler ou publier vos campagnes dès l'ouverture.",
+    "modalCta": "Rejoindre la liste prioritaire",
+    "modalClose": "Fermer"
+  },
+  "howItWorks": {
+    "label": "Comment ça marche",
+    "title": "De la publication de la campagne à la livraison finale.",
+    "tabBrand": "Côté Marque",
+    "tabCreator": "Côté Créateur",
+    "brandSteps": [
+      {
         "step": "1",
-        "heading": "Créez votre profil",
-        "body": "Présentez vos créations, vos plateformes et vos domaines de prédilection. Nous vérifions votre identité et votre portfolio avant de vous référencer."
+        "title": "Publiez votre campagne",
+        "desc": "Secteur, budget indicatif, type de contenu et calendrier. Pas de formulaire interminable."
       },
       {
         "step": "2",
-        "heading": "Soyez mis en relation avec des marques sérieuses",
-        "body": "Nous vous présentons uniquement des marques qui correspondent à votre univers et qui ont exprimé des besoins concrets."
+        "title": "Sélectionnez vos créateurs",
+        "desc": "Les créateurs vérifiés postulent avec leur portfolio. Vous choisissez librement avec qui travailler."
       },
       {
         "step": "3",
-        "heading": "Travaillez dans un cadre professionnel",
-        "body": "Chaque collaboration part d'un accord écrit : ce qu'on vous demande, pour quand, comment vous serez rémunéré. Votre travail est respecté."
+        "title": "Validez l'accord écrit",
+        "desc": "Livrables, droits et échéances sont fixés par écrit avant le début du tournage."
+      }
+    ],
+    "creatorSteps": [
+      {
+        "step": "1",
+        "title": "Validez votre profil",
+        "desc": "Présentez vos réalisations et vos réseaux. Nous confirmons manuellement votre identité."
+      },
+      {
+        "step": "2",
+        "title": "Postulez aux campagnes",
+        "desc": "Parcourez les opportunités avec budget affiché et candidatez aux projets qui vous correspondent."
+      },
+      {
+        "step": "3",
+        "title": "Créez en toute sérénité",
+        "desc": "Travaillez selon un calendrier convenu et avec des conditions de paiement écrites."
       }
     ]
   },
   "collabTypes": {
     "label": "Types de collaboration",
-    "title": "Plusieurs façons de travailler ensemble.",
-    "subtitle": "Chaque collaboration est différente. Voici les formes que ça peut prendre — et ce que chacune signifie concrètement.",
-    "items": [
-      {
-        "type": "Contenu UGC",
-        "heading": "Vous créez, la marque utilise.",
-        "body": "Vous produisez du contenu (vidéo, photo, texte) pour le compte d'une marque. Ce contenu est utilisé dans ses publicités ou ses communications. Vous n'avez pas besoin d'une grande audience — votre talent de créateur compte.",
-        "tag": "Payé"
+    "title": "Quatre façons claires de collaborer.",
+    "subtitle": "Chaque collaboration a des objectifs distincts et des droits d'usage spécifiques.",
+    "types": {
+      "ugc": {
+        "name": "Contenu UGC",
+        "tag": "Création brute",
+        "summary": "Le créateur produit le contenu, la marque le diffuse sur ses propres canaux ou publicités.",
+        "publisher": "Diffusé par la marque",
+        "agreed": "Nombre de rushs, formats 9:16/16:9, durée des droits publicitaires.",
+        "compensation": "Rémunération par livrable produit."
       },
-      {
-        "type": "Publication d'influence",
-        "heading": "Vous publiez sur vos propres réseaux.",
-        "body": "Vous partagez le message d'une marque avec votre audience, sur vos comptes Instagram, TikTok ou YouTube. La portée de votre communauté est votre valeur.",
-        "tag": "Payé"
+      "influence": {
+        "name": "Publication d'influence",
+        "tag": "Visibilité audience",
+        "summary": "Le créateur partage le message ou le produit avec sa propre communauté.",
+        "publisher": "Diffusé par le créateur sur ses réseaux",
+        "agreed": "Date de publication, mention légale du partenariat, maintien en ligne.",
+        "compensation": "Rémunération basée sur la création et la visibilité."
       },
-      {
-        "type": "Hybride",
-        "heading": "Les deux à la fois.",
-        "body": "Vous créez du contenu ET le publiez sur vos réseaux. Cette formule combine les deux formes de valeur — création et diffusion.",
-        "tag": "Payé"
+      "hybrid": {
+        "name": "Hybride",
+        "tag": "Création & Audience",
+        "summary": "Création de contenu pour la marque combinée à un relais sur les réseaux du créateur.",
+        "publisher": "Marque + Créateur (co-diffusion ou amplification)",
+        "agreed": "Droit d'utilisation pour la marque + post organique ou sponsorisé.",
+        "compensation": "Forfait combiné création et visibilité."
       },
-      {
-        "type": "Gifting produit",
-        "heading": "Un produit offert, sans paiement.",
-        "body": "La marque vous envoie un produit en échange d'un contenu ou d'une mention. Important : le gifting n'est pas une rémunération. Les termes (ce que vous livrez, quand) sont toujours précisés à l'avance. Vous êtes libre d'accepter ou de refuser.",
-        "tag": "Non payé"
+      "gifting": {
+        "name": "Dotation produit (Gifting)",
+        "tag": "Sans rémunération financière",
+        "summary": "La marque offre un produit ou service sans obligation stricte de publication, dans une démarche de découverte authentique.",
+        "publisher": "Au libre choix du créateur s'il apprécie l'expérience",
+        "agreed": "Valeur du produit offert, livraison prise en charge.",
+        "compensation": "Produit / expérience offerte uniquement, aucune obligation de publication forcée."
       }
-    ],
-    "note": "Quelle que soit la forme de collaboration, les termes sont toujours définis avant que le travail commence."
+    }
   },
   "vetting": {
-    "label": "Notre processus de vérification",
-    "title": "Ce que nous vérifions — et ce que nous ne prétendons pas vérifier.",
-    "subtitle": "Nous préférons être précis plutôt qu'impressionnants. Voici exactement ce que nous contrôlons pour chaque créateur référencé.",
+    "label": "Confiance & Vérification",
+    "title": "Trois niveaux de vérification transparents.",
+    "subtitle": "Pas de faux badges miracles. Nous vérifions ce qui est vérifiable par des humains.",
     "levels": [
       {
-        "heading": "Identité vérifiée",
-        "body": "Nous confirmons que la personne est réelle et que les informations fournies correspondent. Pas d'anonymat complet, pas de faux profils."
+        "level": "Niveau 1",
+        "name": "Identité vérifiée",
+        "desc": "Contrôle manuel d'une pièce d'identité officielle ou du registre de commerce pour les entreprises."
       },
       {
-        "heading": "Portfolio examiné",
-        "body": "Nous regardons des exemples concrets de travaux. Un créateur UGC nous montre du contenu produit. Un influenceur nous montre des publications réelles."
+        "level": "Niveau 2",
+        "name": "Portfolio examiné",
+        "desc": "Vérification de la régularité, de la qualité visuelle et de l'authenticité des contenus produits."
       },
       {
-        "heading": "Comptes sociaux confirmés",
-        "body": "Nous confirmons que les comptes mentionnés appartiennent bien au créateur. Nous ne vérifions pas les statistiques d'audience — ces données peuvent évoluer et nous ne voulons pas vous induire en erreur."
+        "level": "Niveau 3",
+        "name": "Comptes sociaux confirmés",
+        "desc": "Confirmation directe de l'accès aux profils Instagram, TikTok ou YouTube."
       }
     ],
-    "disclaimer": "Nous ne prétendons pas garantir les résultats d'une campagne ou les performances d'un créateur. Ce que nous garantissons, c'est un cadre sérieux et des informations honnêtes."
+    "disclaimer": "Note d'honnêteté : nous vérifions l'identité et les travaux passés, mais les statistiques d'audience dépendent des réseaux tiers."
   },
-  "promise": {
-    "label": "Notre promesse honnête",
-    "title": "Nous sommes au début. Et nous vous le disons.",
+  "humanTouch": {
+    "title": "Vérification par des humains, choix direct.",
+    "desc": "Pas de sélection automatisée opaque. Notre équipe vérifie chaque profil à la main pour certifier son authenticité. Ensuite, vous choisissez librement avec qui collaborer.",
+    "cta": "Parler à l'équipe sur WhatsApp"
+  },
+  "roadmap": {
+    "label": "En préparation",
+    "title": "Ce que nous construisons pas à pas.",
+    "subtitle": "Voici les prochaines étapes de la plateforme, développées avec les premiers membres.",
     "items": [
-      {
-        "heading": "Les mises en relation sont gérées à la main",
-        "body": "Au démarrage, nous faisons les suggestions nous-mêmes. Ce n'est pas automatisé. C'est plus lent, mais ça nous permet d'être rigoureux et d'apprendre ce qui fonctionne vraiment."
-      },
-      {
-        "heading": "Les paiements avancent étape par étape",
-        "body": "Nous construisons un cadre pour sécuriser les transactions. Pour l'instant, nous vous expliquons exactement comment chaque paiement se passe et ce qui est couvert à chaque étape."
-      },
-      {
-        "heading": "Nous vous disons ce que nous ne faisons pas (encore)",
-        "body": "Nous n'avons pas encore toutes les réponses. Plutôt que d'inventer des certitudes, nous préférons être transparents sur ce qui est en cours de construction."
-      },
-      {
-        "heading": "Votre confiance se gagne",
-        "body": "Nous ne promettons pas des revenus ou des résultats. Nous promettons du sérieux, de la clarté et une relation professionnelle digne de ce nom."
-      }
-    ]
-  },
-  "examples": {
-    "label": "À quoi ça ressemble",
-    "title": "Des exemples concrets.",
-    "subtitle": "Ces exemples sont fictifs et servent à illustrer ce que la plateforme permet. Aucune personne réelle n'est représentée.",
-    "creatorCard": {
-      "badge": "Exemple",
-      "name": "Amara K.",
-      "type": "Créatrice UGC & Influenceuse",
-      "niches": ["Mode", "Beauté", "Lifestyle"],
-      "platforms": [
-        { "name": "Instagram", "followers": "12 400 abonnés" },
-        { "name": "TikTok", "followers": "8 200 abonnés" }
-      ],
-      "bio": "Basée à Kinshasa. Je crée du contenu authentique pour des marques qui veulent parler à une vraie audience congolaise.",
-      "verified": ["Identité vérifiée", "Portfolio examiné", "Comptes confirmés"]
-    },
-    "campaignCard": {
-      "badge": "Exemple",
-      "brandName": "Moda Kinshasa",
-      "sector": "Mode",
-      "need": "Contenu UGC + publication Instagram",
-      "deliverables": "3 vidéos courtes (15–30 s) + 2 photos produit",
-      "deadline": "Sous 3 semaines",
-      "budget": "150–300 USD",
-      "usage": "Droits d'utilisation : publicités Meta pour 3 mois",
-      "note": "Les termes sont définis avant le début du travail."
-    }
+      { "title": "Avis réciproques", "desc": "Évaluation bilatérale après chaque collaboration." },
+      { "title": "Accords numériques", "desc": "Génération et signature des accords directement en ligne." },
+      { "title": "Suivi des livrables", "desc": "Validation des vidéos et des versions en un seul endroit." },
+      { "title": "Paiements à étapes", "desc": "Modalités adaptées aux paiements mobiles locaux (à l'étude)." }
+    ],
+    "founding": "Les premiers membres comptent plus : vous aurez un accès direct à notre équipe pour orienter les fonctionnalités."
   },
   "faq": {
     "label": "Questions fréquentes",
-    "title": "Ce que vous voulez savoir.",
-    "items": [
-      {
-        "q": "Est-ce gratuit ?",
-        "a": "Rejoindre la liste d'attente est entièrement gratuit. Les créateurs ne paieront pas pour être référencés. La structure tarifaire pour les marques sera communiquée avant le lancement — nous vous en informerons en priorité."
-      },
-      {
-        "q": "Quand est-ce que ça lance ?",
-        "a": "Nous ne donnons pas de date que nous ne pouvons pas tenir. Les personnes inscrites sur la liste d'attente seront les premières informées, et les premières à pouvoir rejoindre la plateforme."
-      },
-      {
-        "q": "Je suis une marque — est-ce que je peux choisir mes créateurs ?",
-        "a": "Oui. Nous vous proposons des profils, vous regardez et vous décidez. Vous n'êtes jamais obligé d'aller de l'avant avec une suggestion."
-      },
-      {
-        "q": "Je suis créateur — est-ce que je dois avoir une grande audience ?",
-        "a": "Non. Les créateurs UGC n'ont pas besoin d'une grande audience — leur valeur est dans leur capacité à créer du bon contenu. Pour les collaborations d'influence, l'audience compte, mais la qualité et la pertinence priment sur les chiffres."
-      },
-      {
-        "q": "Comment les paiements fonctionnent-ils ?",
-        "a": "Nous construisons un cadre clair étape par étape. Pour l'instant, nous vous expliquons exactement comment chaque transaction se déroule et ce qui est prévu à chaque étape. Nous ne promettons pas de paiement automatique ou instantané."
-      },
-      {
-        "q": "Que se passe-t-il si une collaboration tourne mal ?",
-        "a": "Nous sommes là. Parce que les termes sont définis à l'avance et écrits, il est plus facile de résoudre un problème. Nous intervenons en tant que tiers si nécessaire. Nous vous expliquerons les détails de ce processus avant tout engagement."
-      },
-      {
-        "q": "Je suis basé hors de Kinshasa. Est-ce que je peux rejoindre ?",
-        "a": "Absolument. Nous accueillons des créateurs et des marques de toute la RDC. Indiquez votre ville lors de l'inscription — cela nous aide à organiser les collaborations."
-      },
-      {
-        "q": "Mes données personnelles sont-elles protégées ?",
-        "a": "Vos données ne sont utilisées que pour gérer la liste d'attente et vous contacter. Elles ne sont pas vendues ni partagées avec des tiers. Vous pouvez demander leur suppression à tout moment en nous contactant par e-mail."
-      }
-    ]
+    "title": "Toutes les réponses, sans détour.",
+    "tabBrands": "Marques",
+    "tabCreators": "Créateurs",
+    "tabGeneral": "Général",
+    "whatsappTitle": "Vous avez une autre question ?",
+    "whatsappSubtitle": "Échangez directement avec un membre de notre équipe sur WhatsApp.",
+    "whatsappCta": "Poser une question sur WhatsApp",
+    "items": {
+      "brands": [
+        {
+          "q": "Comment fonctionne la sélection des créateurs ?",
+          "a": "Vous publiez votre campagne avec votre budget et vos critères. Les créateurs vérifiés intéressés postulent directement avec leur portfolio. Vous choisissez librement le profil qui correspond le mieux à votre image."
+        },
+        {
+          "q": "Combien de temps prend la publication d'une campagne ?",
+          "a": "Votre annonce est vérifiée par notre équipe sous 24h ouvrées. Dès sa mise en ligne, vous commencez à recevoir les candidatures de créateurs vérifiés."
+        },
+        {
+          "q": "Que se passe-t-il si un créateur ne respecte pas l'accord ?",
+          "a": "Chaque mission repose sur un accord écrit précisant les livrables, délais et tours de retouches. Notre équipe intervient comme médiateur humain en cas de blocage."
+        }
+      ],
+      "creators": [
+        {
+          "q": "Est-ce gratuit pour les créateurs ?",
+          "a": "Oui, l'inscription et la participation à la liste d'attente sont totalement gratuites pour les créateurs."
+        },
+        {
+          "q": "Dois-je avoir des dizaines de milliers d'abonnés pour m'inscrire ?",
+          "a": "Non. Pour le contenu UGC par exemple, seule la qualité de votre production compte. Pour l'influence, nous travaillons avec des créateurs engagés dès 1 000 abonnés."
+        },
+        {
+          "q": "Comment suis-je payé pour mon travail ?",
+          "a": "Le montant et le calendrier de règlement sont inscrits noir sur blanc dans l'accord avant que vous ne commenciez à créer. Aucun travail n'est lancé sans validation préalable du budget."
+        }
+      ],
+      "general": [
+        {
+          "q": "Qu'est-ce que Mosala veut dire ?",
+          "a": "Mosala signifie « travail » ou « métier » en lingala. C'est le reflet de notre mission : valoriser le travail des créateurs et cadrer les investissements des marques."
+        },
+        {
+          "q": "Quelle différence avec les autres plateformes ?",
+          "a": "Mosala est conçue spécifiquement pour l'Afrique centrale avec un lancement en RDC : vérification humaine des profils, publication directe de campagnes, accords écrits clairs et prise en compte des réalités locales."
+        },
+        {
+          "q": "Quand la plateforme sera-t-elle officiellement ouverte ?",
+          "a": "Nous ouvrons les accès progressivement aux membres inscrits sur la liste prioritaire afin de maintenir un accompagnement sur mesure."
+        }
+      ]
+    }
   },
   "form": {
-    "title": "Rejoignez la liste d'attente.",
-    "subtitle": "Remplissez le formulaire ci-dessous. Nous vous contacterons sur WhatsApp dès que nous sommes prêts à vous accueillir.",
-    "roleLabel": "Vous êtes...",
-    "roleBrand": "Une marque ou une entreprise",
-    "roleCreator": "Un créateur de contenu",
-    "fullName": "Nom complet",
+    "step1Title": "Étape 1 : Vos coordonnées indispensables",
+    "step1Subtitle": "Remplissez ces champs pour réserver votre place prioritaire.",
+    "step2Title": "Étape 2 (Facultative) : Précisez votre profil",
+    "step2Subtitle": "Ces détails nous aident à vérifier votre profil plus rapidement.",
+    "roleBrand": "Marque / Entreprise",
+    "roleCreator": "Créateur de contenu",
+    "fullName": "Nom complet ou Nom de marque",
+    "fullNamePlaceholder": "Ex: Marie Kabongo / Studio Kin",
     "whatsapp": "Numéro WhatsApp (avec indicatif)",
-    "whatsappPlaceholder": "+243 8XX XXX XXX",
-    "email": "E-mail (facultatif)",
-    "emailPlaceholder": "votre@email.com",
-    "city": "Ville",
-    "cityPlaceholder": "Ex : Kinshasa, Lubumbashi...",
-    "businessName": "Nom de votre entreprise ou marque",
+    "whatsappPlaceholder": "Ex: +243 812 345 678",
+    "email": "Adresse email professionnelle",
+    "emailPlaceholder": "Ex: contact@votre-domaine.com",
+    "city": "Ville de résidence / d'activité",
+    "cityPlaceholder": "Kinshasa, Lubumbashi, Goma, etc.",
+    "step1Submit": "Réserver ma place prioritaire",
+    "step2Submit": "Enregistrer mon profil",
+    "skipStep2": "Passer cette étape",
     "sector": "Secteur d'activité",
-    "sectorPlaceholder": "Choisissez un secteur",
+    "sectorPlaceholder": "Choisissez votre secteur",
     "sectors": {
-      "fashion": "Mode",
-      "beauty": "Beauté",
+      "fashion": "Mode & Habillement",
+      "beauty": "Beauté & Cosmétiques",
       "food": "Alimentation & Restauration",
       "hospitality": "Hôtellerie & Tourisme",
-      "auto": "Automobile",
-      "fitness": "Sport & Fitness",
-      "ecommerce": "E-commerce",
-      "tech": "Technologie",
-      "other": "Autre"
+      "auto": "Automobile & Transport",
+      "tech": "Technologie & Télécoms",
+      "finance": "Services & Finance",
+      "other": "Autre secteur"
     },
-    "creatorNeed": "Ce dont vous avez besoin",
-    "creatorNeedPlaceholder": "Choisissez une option",
-    "creatorNeeds": {
-      "ugc": "Contenu UGC (pour mes publicités)",
-      "influencer": "Publications d'influenceurs (sur leurs réseaux)",
-      "both": "Les deux",
-      "unsure": "Pas encore sûr"
-    },
-    "budget": "Budget mensuel indicatif (USD)",
+    "budget": "Budget mensuel indicatif",
     "budgetPlaceholder": "Choisissez une fourchette",
     "budgets": {
       "under_200": "Moins de 200 $",
-      "200_500": "200 $ – 500 $",
-      "500_1000": "500 $ – 1 000 $",
+      "200_500": "200 $ à 500 $",
+      "500_1000": "500 $ à 1 000 $",
       "1000_plus": "Plus de 1 000 $",
-      "unsure": "Pas encore sûr"
+      "gifting_only": "Dotation produit uniquement"
     },
-    "workedBefore": "Avez-vous déjà travaillé avec des créateurs ?",
-    "workedBeforePlaceholder": "Choisissez une réponse",
-    "yes": "Oui",
-    "no": "Non",
-    "websiteOrInsta": "Site web ou profil Instagram de votre marque (facultatif)",
-    "websiteOrInstaPlaceholder": "https://... ou @votrecompte",
-    "creatorName": "Votre nom ou pseudo de créateur",
-    "creatorType": "Vous êtes...",
-    "creatorTypePlaceholder": "Choisissez votre profil",
-    "creatorTypes": {
-      "ugc": "Créateur UGC (je crée du contenu pour des marques)",
-      "influencer": "Influenceur (je publie sur mes propres réseaux)",
-      "both": "Les deux"
-    },
-    "niches": "Vos domaines de prédilection",
-    "nicheOptions": {
-      "fashion": "Mode",
-      "beauty": "Beauté",
-      "food": "Alimentation",
-      "lifestyle": "Lifestyle",
-      "fitness": "Sport & Fitness",
-      "tech": "Technologie",
-      "auto": "Automobile",
-      "travel": "Voyage",
-      "parenting": "Parentalité",
-      "finance": "Finance",
-      "music": "Musique",
-      "comedy": "Comédie",
-      "other": "Autre"
-    },
-    "instagram": "Instagram",
-    "instagramHandle": "Nom d'utilisateur Instagram",
-    "instagramHandlePlaceholder": "@votre_compte",
-    "tiktok": "TikTok",
-    "tiktokHandle": "Nom d'utilisateur TikTok",
-    "tiktokHandlePlaceholder": "@votre_compte",
-    "youtube": "YouTube",
-    "youtubeHandle": "Nom de chaîne YouTube",
-    "youtubeHandlePlaceholder": "Votre chaîne",
-    "followerRange": "Nombre d'abonnés",
-    "followerRangePlaceholder": "Choisissez une fourchette",
-    "followerRanges": {
-      "under_1k": "Moins de 1 000",
-      "1k_5k": "1 000 – 5 000",
-      "5k_20k": "5 000 – 20 000",
-      "20k_100k": "20 000 – 100 000",
-      "100k_plus": "Plus de 100 000"
-    },
-    "portfolioLink": "Lien vers votre portfolio ou vos créations (facultatif)",
-    "portfolioLinkPlaceholder": "https://...",
-    "paidBefore": "Avez-vous déjà été rémunéré par une marque ?",
-    "rateRange": "Votre tarif habituel (USD, facultatif)",
-    "rateRangePlaceholder": "Choisissez une fourchette",
-    "rateRanges": {
-      "under_50": "Moins de 50 $",
-      "50_150": "50 $ – 150 $",
-      "150_500": "150 $ – 500 $",
-      "500_plus": "Plus de 500 $",
-      "unsure": "Pas encore sûr"
-    },
-    "consent": "J'accepte que mes informations soient utilisées uniquement pour gérer ma liste d'attente et me contacter. Elles ne seront pas vendues ni partagées. Je peux demander leur suppression à tout moment.",
-    "consentLink": "En savoir plus",
-    "submit": "Rejoindre la liste d'attente",
-    "submitting": "Envoi en cours...",
-    "errors": {
-      "required": "Ce champ est obligatoire.",
-      "invalidPhone": "Entrez un numéro WhatsApp valide avec indicatif, ex : +243812345678",
-      "invalidEmail": "Entrez une adresse e-mail valide.",
-      "invalidUrl": "Entrez une URL valide (ex : https://...).",
-      "consentRequired": "Vous devez accepter pour continuer.",
-      "selectAtLeastOne": "Choisissez au moins une option.",
-      "roleRequired": "Choisissez si vous êtes une marque ou un créateur.",
-      "serverError": "Une erreur s'est produite. Réessayez dans quelques instants.",
-      "duplicate": "Ce numéro WhatsApp est déjà inscrit. Nous vous contacterons bientôt."
-    },
-    "success": {
-      "title": "Vous êtes sur la liste !",
-      "body": "Nous avons bien reçu votre inscription. Nous vous contacterons sur WhatsApp dès que nous sommes prêts à vous accueillir.",
-      "share": "Partager sur WhatsApp",
-      "shareMessage": "Je viens de m'inscrire sur la liste prioritaire — découvrez la plateforme ici : {url}"
-    }
+    "niches": "Vos niches principales (choix multiples)",
+    "socialLinksHelper": "Ajoutez au moins un lien pour accélérer votre vérification.",
+    "instagram": "Compte Instagram",
+    "tiktok": "Compte TikTok",
+    "youtube": "Chaîne YouTube",
+    "facebook": "Page Facebook",
+    "website": "Site web officiel",
+    "portfolio": "Lien portfolio / réalisations",
+    "successTitle": "Inscription confirmée !",
+    "successMessage": "Vous êtes désormais sur la liste prioritaire de Mosala. Nous vous contacterons directement sur WhatsApp lors de l'ouverture de votre accès.",
+    "shareCta": "Inviter un confrère ou un créateur",
+    "shareSuccess": "Lien de parrainage copié !"
+  },
+  "privacy": {
+    "title": "Données personnelles & Confidentialité",
+    "whatWeCollect": "Informations collectées",
+    "whatWeCollectDesc": "Votre nom, numéro WhatsApp, adresse email, ville, et les liens sociaux ou portfolios facultatifs que vous choisissez de renseigner.",
+    "why": "Pourquoi nous les collectons",
+    "whyDesc": "Uniquement pour gérer votre accès prioritaire, valider l'authenticité de votre profil et vous contacter sur WhatsApp lors de l'ouverture de la plateforme.",
+    "whoSeesIt": "Qui a accès à vos données",
+    "whoSeesItDesc": "Seule l'équipe fondatrice de Mosala y a accès. Vos informations ne sont jamais vendues, louées ou transmises à des tiers sans votre accord explicite.",
+    "deletion": "Demande de suppression",
+    "deletionDesc": "Vous pouvez demander la suppression immédiate et définitive de vos données à tout moment par simple message WhatsApp ou par email à l'équipe."
   },
   "footer": {
-    "tagline": "Connecter les marques et les créateurs.",
+    "tagline": "Des accords clairs entre marques et créateurs.",
+    "meaning": "Mosala signifie travail en lingala.",
     "contact": "Contact",
-    "contactEmail": "contact@kolab.co",
-    "privacy": "Vos données personnelles sont utilisées uniquement pour gérer la liste d'attente. Elles ne sont pas vendues ni partagées. Contactez-nous pour toute demande de suppression.",
+    "privacy": "Vos informations sont utilisées exclusivement pour la gestion de la liste prioritaire. Aucun partage commercial.",
     "rights": "Tous droits réservés.",
-    "madeWith": "Fait avec soin."
+    "madeWith": "Fait avec soin pour l'Afrique centrale."
   }
 }

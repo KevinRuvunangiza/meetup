@@ -21,7 +21,7 @@ import en from '@/i18n/en.json'
  * Usage:
  *   const { t, lang, setLang } = useTranslation()
  *   t('hero.title')           → string
- *   t('hero.subtitle', { name: 'KOLAB' }) → interpolated string
+ *   t('hero.subtitle', { name: 'MOSALA' }) → interpolated string
  */
 
 // Accept any string key — the function returns the key itself if not found,

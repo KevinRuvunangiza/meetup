@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
+import { useTranslation } from '@/hooks/useTranslation'
 import {
   feedCategories,
   campaignExamples,
@@ -22,6 +23,7 @@ interface FeedProps {
 }
 
 export function Feed({ onJoinWaitlist }: FeedProps) {
+  const { t } = useTranslation()
   const shouldReduceMotion = useReducedMotion()
   const [selectedFeedType, setSelectedFeedType] = useState<'campaigns' | 'creators'>('campaigns')
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>('tout')
@@ -55,11 +57,14 @@ export function Feed({ onJoinWaitlist }: FeedProps) {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
+            <span className="inline-block text-xs font-bold uppercase tracking-wider text-saffron bg-ink px-3 py-1 rounded-full mb-3">
+              {t('feed.label')}
+            </span>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight leading-tight">
-              Ce qui se prépare sur la plateforme.
+              {t('feed.title')}
             </h2>
-            <p className="mt-3 text-base text-muted max-w-xl leading-relaxed">
-              Explorez les types de briefs et de créateurs qui composeront les premières opportunités de collaboration.
+            <p className="mt-3 text-base text-textMuted max-w-xl leading-relaxed">
+              {t('feed.subtitle')}
             </p>
           </div>
 
@@ -246,8 +251,8 @@ export function Feed({ onJoinWaitlist }: FeedProps) {
         </AnimatePresence>
 
         {/* Discreet Honest Illustration Disclaimer */}
-        <p className="text-center text-xs text-muted/80 mt-10">
-          Aperçu illustratif, aucune marque réelle représentée.
+        <p className="text-center text-xs text-textMuted mt-10 font-medium">
+          {t('feed.disclaimer')}
         </p>
 
         {/* Campaign Preview Modal */}

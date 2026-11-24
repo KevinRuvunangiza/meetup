@@ -1,84 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  OG IMAGE PLACEHOLDER
-  ─────────────────────────────────────────────────────────────────────────────
-  This SVG is the source for the og-image.png.
-  To generate the PNG:
-    1. Open this file in a browser or Figma
-    2. Export at 1200×630 px as PNG
-    3. Save as public/og-image.png
-
-  Design: dark background, signal yellow accent, wordmark, tagline.
-  Matches site design tokens.
--->
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <!-- Background: ink -->
-  <rect width="1200" height="630" fill="#0B0B0C"/>
+  <!-- Background: Ink -->
+  <rect width="1200" height="630" fill="#0E0E0E"/>
 
-  <!-- Yellow accent bar (top) -->
-  <rect x="0" y="0" width="1200" height="8" fill="#FFD60A"/>
-
-  <!-- Yellow accent stripe (decorative, right side) -->
-  <rect x="980" y="0" width="4" height="630" fill="#FFD60A" opacity="0.3"/>
+  <!-- Saffron accent bar (top) -->
+  <rect x="0" y="0" width="1200" height="8" fill="#F2A900"/>
 
   <!-- Wordmark -->
   <text
-    x="80"
-    y="300"
-    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
-    font-size="96"
-    font-weight="900"
-    fill="#FFFFFF"
-    letter-spacing="-2"
-  >KOLAB</text>
-
-  <!-- Yellow underline under wordmark -->
-  <rect x="80" y="318" width="440" height="6" fill="#FFD60A" rx="3"/>
+    x="100"
+    y="280"
+    font-family="'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="110"
+    font-weight="800"
+    fill="#F4EFE6"
+    letter-spacing="-3"
+  >MOSALA<tspan fill="#F2A900">.</tspan></text>
 
   <!-- Tagline -->
   <text
-    x="80"
-    y="400"
-    font-family="'Arial', 'Helvetica Neue', Arial, sans-serif"
-    font-size="28"
-    fill="#FAFAF7"
-    opacity="0.7"
-  >Marques &amp; Créateurs · RDC</text>
+    x="100"
+    y="360"
+    font-family="'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="34"
+    font-weight="600"
+    fill="#F4EFE6"
+  >Marques &amp; Créateurs · Des accords clairs par écrit.</text>
 
-  <!-- Subtagline -->
+  <!-- Subtitle -->
   <text
-    x="80"
-    y="445"
-    font-family="'Arial', 'Helvetica Neue', Arial, sans-serif"
+    x="100"
+    y="415"
+    font-family="'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
     font-size="22"
-    fill="#5B5B60"
-  >La plateforme de confiance pour collaborer.</text>
+    fill="#A49F96"
+  >Une équipe humaine pour vérifier chaque profil et cadrer chaque collaboration.</text>
 
-  <!-- Waitlist badge -->
-  <rect x="80" y="510" width="220" height="48" rx="24" fill="#FFD60A"/>
+  <!-- Waitlist Badge -->
+  <rect x="100" y="475" width="260" height="52" rx="26" fill="#F2A900"/>
   <text
-    x="190"
-    y="541"
-    font-family="'Arial', 'Helvetica Neue', Arial, sans-serif"
+    x="230"
+    y="508"
+    font-family="'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
     font-size="18"
     font-weight="700"
-    fill="#0B0B0C"
+    fill="#0E0E0E"
     text-anchor="middle"
   >Liste d'attente ouverte</text>
 
-  <!-- Decorative dot grid (bottom right) -->
-  <g opacity="0.08" fill="#FFD60A">
-    <circle cx="1050" cy="460" r="4"/>
-    <circle cx="1090" cy="460" r="4"/>
-    <circle cx="1130" cy="460" r="4"/>
-    <circle cx="1050" cy="500" r="4"/>
-    <circle cx="1090" cy="500" r="4"/>
-    <circle cx="1130" cy="500" r="4"/>
-    <circle cx="1050" cy="540" r="4"/>
-    <circle cx="1090" cy="540" r="4"/>
-    <circle cx="1130" cy="540" r="4"/>
-    <circle cx="1050" cy="580" r="4"/>
-    <circle cx="1090" cy="580" r="4"/>
-    <circle cx="1130" cy="580" r="4"/>
-  </g>
+  <!-- Decorative geometric detail -->
+  <circle cx="1060" cy="315" r="160" fill="none" stroke="#F2A900" stroke-width="1.5" opacity="0.25"/>
+  <circle cx="1060" cy="315" r="90" fill="none" stroke="#F4EFE6" stroke-width="1" opacity="0.15"/>
 </svg>

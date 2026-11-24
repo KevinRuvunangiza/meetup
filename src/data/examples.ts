@@ -45,6 +45,8 @@ export interface CampaignItem {
   duotone: {
     bg: string
     accent: string
+    secondary?: string
+    patternType?: 'mode' | 'beaute' | 'auto' | 'food' | 'hotels' | 'tech'
     paletteId: number
   }
 }
@@ -84,7 +86,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: '$300 – $550',
     deadline: '20 jours',
     creatorsNeeded: 4,
-    duotone: { bg: '#181715', accent: '#F2A900', paletteId: 1 },
+    duotone: {
+      bg: '#241410',
+      accent: '#E07A5F',
+      secondary: '#F4A261',
+      patternType: 'mode',
+      paletteId: 1,
+    },
   },
   {
     id: 'camp-2',
@@ -99,7 +107,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: '$250 – $400',
     deadline: '3 semaines',
     creatorsNeeded: 3,
-    duotone: { bg: '#1A1817', accent: '#E09200', paletteId: 2 },
+    duotone: {
+      bg: '#0F1D17',
+      accent: '#52B788',
+      secondary: '#95D5B2',
+      patternType: 'beaute',
+      paletteId: 2,
+    },
   },
   {
     id: 'camp-3',
@@ -114,7 +128,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: '$450 – $700',
     deadline: '1 mois',
     creatorsNeeded: 2,
-    duotone: { bg: '#141416', accent: '#F2A900', paletteId: 3 },
+    duotone: {
+      bg: '#11141A',
+      accent: '#F2A900',
+      secondary: '#3A86FF',
+      patternType: 'auto',
+      paletteId: 3,
+    },
   },
   {
     id: 'camp-4',
@@ -129,7 +149,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: 'Produit offert ($120 val.)',
     deadline: '15 jours',
     creatorsNeeded: 5,
-    duotone: { bg: '#191612', accent: '#D99700', paletteId: 4 },
+    duotone: {
+      bg: '#20120C',
+      accent: '#D4A373',
+      secondary: '#E9D8A6',
+      patternType: 'food',
+      paletteId: 4,
+    },
   },
   {
     id: 'camp-5',
@@ -144,7 +170,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: '$300 + Séjour offert',
     deadline: '25 jours',
     creatorsNeeded: 2,
-    duotone: { bg: '#151413', accent: '#F2A900', paletteId: 5 },
+    duotone: {
+      bg: '#0E1724',
+      accent: '#C5A880',
+      secondary: '#8DA9C4',
+      patternType: 'hotels',
+      paletteId: 5,
+    },
   },
   {
     id: 'camp-6',
@@ -159,7 +191,13 @@ export const campaignExamples: CampaignItem[] = [
     budget: '$350 – $500',
     deadline: '18 jours',
     creatorsNeeded: 3,
-    duotone: { bg: '#161719', accent: '#E09B00', paletteId: 6 },
+    duotone: {
+      bg: '#11101E',
+      accent: '#8338EC',
+      secondary: '#00F5D4',
+      patternType: 'tech',
+      paletteId: 6,
+    },
   },
 ]
 
@@ -177,7 +215,7 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'instagram', followers: '14.2K' },
       { platform: 'tiktok', followers: '28.5K' },
     ],
-    duotone: { bg: '#1A1815', accent: '#F2A900', paletteId: 1 },
+    duotone: { bg: '#241410', accent: '#E07A5F', paletteId: 1 },
   },
   {
     id: 'creat-2',
@@ -192,7 +230,7 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'youtube', followers: '19.8K' },
       { platform: 'tiktok', followers: '42.1K' },
     ],
-    duotone: { bg: '#25211D', accent: '#E59900', paletteId: 2 },
+    duotone: { bg: '#11101E', accent: '#8338EC', paletteId: 2 },
   },
   {
     id: 'creat-3',
@@ -207,7 +245,7 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'instagram', followers: '11.6K' },
       { platform: 'tiktok', followers: '34.0K' },
     ],
-    duotone: { bg: '#151412', accent: '#D99700', paletteId: 3 },
+    duotone: { bg: '#0F1D17', accent: '#52B788', paletteId: 3 },
   },
   {
     id: 'creat-4',
@@ -222,7 +260,7 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'tiktok', followers: '51.4K' },
       { platform: 'instagram', followers: '18.9K' },
     ],
-    duotone: { bg: '#1D1915', accent: '#F2A900', paletteId: 4 },
+    duotone: { bg: '#20120C', accent: '#D4A373', paletteId: 4 },
   },
   {
     id: 'creat-5',
@@ -237,7 +275,7 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'instagram', followers: '22.3K' },
       { platform: 'tiktok', followers: '16.7K' },
     ],
-    duotone: { bg: '#161513', accent: '#D99700', paletteId: 5 },
+    duotone: { bg: '#0E1724', accent: '#C5A880', paletteId: 5 },
   },
   {
     id: 'creat-6',
@@ -252,6 +290,6 @@ export const creatorExamples: CreatorItem[] = [
       { platform: 'youtube', followers: '15.1K' },
       { platform: 'tiktok', followers: '39.8K' },
     ],
-    duotone: { bg: '#181A1C', accent: '#F2A900', paletteId: 6 },
+    duotone: { bg: '#11141A', accent: '#F2A900', paletteId: 6 },
   },
 ]

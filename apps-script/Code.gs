@@ -1,5 +1,5 @@
 /**
- * KOLAB WAITLIST — Google Apps Script (Production Ready)
+ * MOSALA WAITLIST — Google Apps Script (Production Ready)
  * ─────────────────────────────────────────────────────────────────────────────
  * CRITICAL DEPLOYMENT SETTINGS (To prevent CORS / 401 errors):
  *
@@ -24,15 +24,13 @@ const CREATORS_SHEET = 'Creators';
 // Column headers for each sheet
 const BRAND_HEADERS = [
   'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
-  'Business Name', 'Sector', 'Creator Need', 'Budget', 'Worked Before',
-  'Website/Instagram'
+  'Business Name', 'Sector', 'Budget', 'Website', 'Instagram', 'Facebook'
 ];
 
 const CREATOR_HEADERS = [
   'Timestamp', 'Source', 'Full Name', 'WhatsApp', 'Email', 'City',
-  'Creator Name', 'Creator Type', 'Niches', 'Instagram Handle', 'Instagram Followers',
-  'TikTok Handle', 'TikTok Followers', 'YouTube Handle', 'YouTube Followers',
-  'Portfolio Link', 'Paid Before', 'Rate Range'
+  'Creator Name', 'Niches', 'Instagram', 'TikTok', 'YouTube', 'Facebook',
+  'Portfolio Link'
 ];
 
 /**
@@ -84,6 +82,7 @@ function doPost(e) {
 function doGet() {
   return jsonResponse({
     status: 'ok',
+    platform: 'MOSALA',
     message: 'Waitlist API is live and accepting submissions.',
     timestamp: new Date().toISOString()
   });
@@ -101,14 +100,9 @@ function doOptions() {
 
 function handleBrand(ss, data, timestamp) {
   const sheet = getOrCreateSheet(ss, BRANDS_SHEET, BRAND_HEADERS);
-
-  // Duplicate check by WhatsApp number (column 4 = WhatsApp, 1-indexed)
-  if (isDuplicate(sheet, data.whatsapp, 4)) {
-    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
-  }
-
   const serverTimestamp = new Date().toISOString();
-  const row = [
+
+  const newRow = [
     serverTimestamp,
     data.source || 'direct',
     sanitize(data.fullName),
@@ -117,15 +111,31 @@ function handleBrand(ss, data, timestamp) {
     sanitize(data.city || 'Kinshasa'),
     sanitize(data.businessName || data.fullName || ''),
     sanitize(data.sector || ''),
-    sanitize(data.creatorNeed || ''),
     sanitize(data.budget || ''),
-    sanitize(data.workedBefore || ''),
-    sanitize(data.websiteOrInsta || ''),
+    sanitize(data.website || data.websiteOrInsta || ''),
+    sanitize(data.instagram || ''),
+    sanitize(data.facebook || ''),
   ];
 
-  sheet.appendRow(row);
-  console.log('Brand registered:', data.whatsapp, timestamp);
+  // If already registered by WhatsApp number, update existing row while preserving earlier values
+  const existingRowIdx = findRowByPhone(sheet, data.whatsapp, 4);
+  if (existingRowIdx > 0) {
+    const existingRange = sheet.getRange(existingRowIdx, 1, 1, newRow.length);
+    const existingValues = existingRange.getValues()[0];
 
+    // Merge: keep new non-empty values, fallback to existing values
+    const mergedRow = newRow.map((val, idx) => {
+      if (idx === 0) return serverTimestamp; // update timestamp
+      return val !== '' ? val : (existingValues[idx] || '');
+    });
+
+    existingRange.setValues([mergedRow]);
+    console.log('Brand updated:', data.whatsapp, timestamp);
+    return jsonResponse({ success: true, updated: true, message: 'Profil mis à jour.' });
+  }
+
+  sheet.appendRow(newRow);
+  console.log('Brand registered:', data.whatsapp, timestamp);
   return jsonResponse({ success: true, message: 'Brand registered successfully.' });
 }
 
@@ -133,16 +143,10 @@ function handleBrand(ss, data, timestamp) {
 
 function handleCreator(ss, data, timestamp) {
   const sheet = getOrCreateSheet(ss, CREATORS_SHEET, CREATOR_HEADERS);
-
-  // Duplicate check by WhatsApp number
-  if (isDuplicate(sheet, data.whatsapp, 4)) {
-    return jsonResponse({ success: false, duplicate: true, message: 'Already registered.' });
-  }
-
   const serverTimestamp = new Date().toISOString();
   const niches = Array.isArray(data.niches) ? data.niches.join(', ') : (data.niches || '');
 
-  const row = [
+  const newRow = [
     serverTimestamp,
     data.source || 'direct',
     sanitize(data.fullName),
@@ -150,22 +154,32 @@ function handleCreator(ss, data, timestamp) {
     sanitize(data.email || ''),
     sanitize(data.city || 'Kinshasa'),
     sanitize(data.creatorName || data.fullName || ''),
-    sanitize(data.creatorType || ''),
     sanitize(niches),
-    sanitize(data.instagramHandle || ''),
-    sanitize(data.instagramFollowers || ''),
-    sanitize(data.tiktokHandle || ''),
-    sanitize(data.tiktokFollowers || ''),
-    sanitize(data.youtubeHandle || ''),
-    sanitize(data.youtubeFollowers || ''),
+    sanitize(data.instagram || data.instagramHandle || ''),
+    sanitize(data.tiktok || data.tiktokHandle || ''),
+    sanitize(data.youtube || data.youtubeHandle || ''),
+    sanitize(data.facebook || ''),
     sanitize(data.portfolioLink || ''),
-    sanitize(data.paidBefore || ''),
-    sanitize(data.rateRange || ''),
   ];
 
-  sheet.appendRow(row);
-  console.log('Creator registered:', data.whatsapp, timestamp);
+  // If already registered by WhatsApp number, update existing row while preserving earlier values
+  const existingRowIdx = findRowByPhone(sheet, data.whatsapp, 4);
+  if (existingRowIdx > 0) {
+    const existingRange = sheet.getRange(existingRowIdx, 1, 1, newRow.length);
+    const existingValues = existingRange.getValues()[0];
 
+    const mergedRow = newRow.map((val, idx) => {
+      if (idx === 0) return serverTimestamp;
+      return val !== '' ? val : (existingValues[idx] || '');
+    });
+
+    existingRange.setValues([mergedRow]);
+    console.log('Creator updated:', data.whatsapp, timestamp);
+    return jsonResponse({ success: true, updated: true, message: 'Profil mis à jour.' });
+  }
+
+  sheet.appendRow(newRow);
+  console.log('Creator registered:', data.whatsapp, timestamp);
   return jsonResponse({ success: true, message: 'Creator registered successfully.' });
 }
 
@@ -183,15 +197,20 @@ function getOrCreateSheet(ss, name, headers) {
   return sheet;
 }
 
-function isDuplicate(sheet, value, columnIndex) {
+function findRowByPhone(sheet, value, columnIndex) {
   const lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return false;
+  if (lastRow <= 1) return -1;
 
   const range = sheet.getRange(2, columnIndex, lastRow - 1, 1);
   const values = range.getValues();
-
   const normalised = normalisePhone(value);
-  return values.some(([cell]) => normalisePhone(String(cell)) === normalised);
+
+  for (let i = 0; i < values.length; i++) {
+    if (normalisePhone(String(values[i][0])) === normalised) {
+      return i + 2; // 1-indexed, skipping header
+    }
+  }
+  return -1;
 }
 
 function normalisePhone(phone) {
@@ -202,7 +221,7 @@ function normalisePhone(phone) {
 function sanitize(value) {
   if (value === null || value === undefined) return '';
   const str = String(value).trim();
-  if (['+', '-', '=', '@', '\t', '\r'].some(ch => str.startsWith(ch))) {
+  if (['+', '-', '=', '@', '\t', '\r'].some(function(ch) { return str.startsWith(ch); })) {
     return "'" + str; // Treat as text in Sheets
   }
   return str;
@@ -231,9 +250,12 @@ function validatePayload(payload) {
     return { ok: false, message: 'Le numéro WhatsApp est requis.' };
   }
 
-  // Flexible phone format: accepts +243..., 243..., 08... (7 to 15 digits)
   if (!/^\+?[0-9]{7,15}$/.test(phone)) {
     return { ok: false, message: 'Numéro WhatsApp invalide.' };
+  }
+
+  if (!data.email || !String(data.email).trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email).trim())) {
+    return { ok: false, message: 'Une adresse email valide est requise.' };
   }
 
   return { ok: true };

@@ -1,56 +1,76 @@
-/**
- * VETTING SECTION
- * Honest breakdown of what is and isn't verified.
- * No single "verified" badge — separate levels with clear labels.
- */
-import { motion } from 'motion/react'
-import { Section, SectionHeader } from '@/components/ui/Section'
 import { useTranslation } from '@/hooks/useTranslation'
-
-interface VettingLevel {
-  heading: string
-  body: string
-}
-
-const icons = ['🪪', '🗂️', '📱']
+import {
+  PiIdentificationCard,
+  PiFilmReel,
+  PiCheckCircleFill,
+  PiInfo,
+} from 'react-icons/pi'
 
 export function Vetting() {
   const { t } = useTranslation()
-  const levels = t('vetting.levels') as unknown as VettingLevel[]
-  const list = Array.isArray(levels) ? levels : []
+
+  const levels = t<Array<{ level: string; name: string; desc: string }>>('vetting.levels')
+  const icons = [PiIdentificationCard, PiFilmReel, PiCheckCircleFill]
 
   return (
-    <Section id="vetting" dark>
-      <SectionHeader
-        label={t('vetting.label')}
-        title={t('vetting.title')}
-        subtitle={t('vetting.subtitle')}
-        light
-      />
+    <section className="bg-cream py-16 md:py-24 border-b border-border">
+      <div className="container-site">
+        <div className="max-w-2xl mb-12">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider text-saffron bg-ink px-3 py-1 rounded-full mb-3">
+            {t('vetting.label')}
+          </span>
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight mb-4">
+            {t('vetting.title')}
+          </h2>
+          <p className="text-base text-textMuted leading-relaxed">
+            {t('vetting.subtitle')}
+          </p>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-10">
-        {list.map((level, i) => (
-          <motion.div
-            key={level.heading}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
-            className="rounded-xl border border-white/10 bg-charcoal p-6"
-          >
-            <div className="mb-4 text-3xl" role="img" aria-label={level.heading}>
-              {icons[i]}
-            </div>
-            <h3 className="mb-2 font-bold text-white">{level.heading}</h3>
-            <p className="text-sm leading-relaxed text-white/60">{level.body}</p>
-          </motion.div>
-        ))}
-      </div>
+        {/* 3 Verification Levels */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {Array.isArray(levels) &&
+            levels.map((lvl, idx) => {
+              const Icon = icons[idx] ?? PiCheckCircleFill
+              return (
+                <div
+                  key={idx}
+                  className="relative rounded-2xl border border-creamDarker bg-creamCard p-8 shadow-sm hover:border-saffron/40 hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <span className="rounded-full bg-saffronSoft border border-saffron/30 px-3 py-1 text-xs font-bold text-ink">
+                        {lvl.level}
+                      </span>
+                      <div className="h-10 w-10 rounded-xl bg-ink text-saffron flex items-center justify-center">
+                        <Icon size={20} />
+                      </div>
+                    </div>
 
-      {/* Disclaimer — important honesty note */}
-      <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-4">
-        <p className="text-sm text-white/70">{t('vetting.disclaimer')}</p>
+                    <h3 className="font-display text-xl font-bold text-ink mb-3">
+                      {lvl.name}
+                    </h3>
+                    <p className="text-sm text-textMuted leading-relaxed">
+                      {lvl.desc}
+                    </p>
+                  </div>
+
+                  <div className="pt-6 mt-6 border-t border-creamDarker/50 text-[11px] font-semibold text-textMuted uppercase tracking-wider">
+                    Contrôle humain individuel
+                  </div>
+                </div>
+              )
+            })}
+        </div>
+
+        {/* Honest Note Callout */}
+        <div className="rounded-xl bg-creamDarker/50 border border-border p-4 flex items-start gap-3 max-w-3xl">
+          <PiInfo size={18} className="text-textMuted mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-textMuted leading-relaxed font-medium">
+            {t('vetting.disclaimer')}
+          </p>
+        </div>
       </div>
-    </Section>
+    </section>
   )
 }

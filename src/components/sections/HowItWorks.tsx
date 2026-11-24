@@ -1,84 +1,134 @@
-/**
- * HOW IT WORKS SECTION
- * Two columns: Brands (3 steps) and Creators (3 steps).
- * Dark background to visually separate from Problem section.
- */
-import { motion } from 'motion/react'
-import { Section, SectionHeader } from '@/components/ui/Section'
+import { useState } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useTranslation } from '@/hooks/useTranslation'
-
-interface Step {
-  step: string
-  heading: string
-  body: string
-}
-
-function StepList({ steps, light }: { steps: Step[]; light: boolean }) {
-  const list = Array.isArray(steps) ? steps : []
-  return (
-    <ol className="flex flex-col gap-8">
-      {list.map((s, i) => (
-        <motion.li
-          key={s.step}
-          initial={{ opacity: 0, x: -12 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
-          className="flex gap-5"
-        >
-          {/* Step number */}
-          <div
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-signal text-ink font-bold text-sm"
-            aria-hidden="true"
-          >
-            {s.step}
-          </div>
-
-          <div>
-            <h4 className={['font-bold mb-1', light ? 'text-white' : 'text-ink'].join(' ')}>
-              {s.heading}
-            </h4>
-            <p className={['text-sm leading-relaxed', light ? 'text-white/60' : 'text-muted'].join(' ')}>
-              {s.body}
-            </p>
-          </div>
-        </motion.li>
-      ))}
-    </ol>
-  )
-}
+import {
+  PiBuildings,
+  PiUser,
+  PiArrowRight,
+  PiPencilSimpleLine,
+  PiCards,
+  PiCheckCircle,
+  PiHandshake,
+  PiFilmSlate,
+  PiSealCheck,
+} from 'react-icons/pi'
+import type { Role } from '@/types/form'
 
 export function HowItWorks() {
   const { t } = useTranslation()
+  const shouldReduceMotion = useReducedMotion()
+  const [activeRole, setActiveRole] = useState<Role>('brand')
 
-  const brandSteps = t('howItWorks.brand') as unknown as Step[]
-  const creatorSteps = t('howItWorks.creator') as unknown as Step[]
+  const brandSteps = t<Array<{ step: string; title: string; desc: string }>>('howItWorks.brandSteps')
+  const creatorSteps = t<Array<{ step: string; title: string; desc: string }>>('howItWorks.creatorSteps')
+
+  const currentSteps = activeRole === 'brand' ? brandSteps : creatorSteps
+
+  const brandIcons = [PiPencilSimpleLine, PiCards, PiHandshake]
+  const creatorIcons = [PiSealCheck, PiCards, PiFilmSlate]
+  const currentIcons = activeRole === 'brand' ? brandIcons : creatorIcons
 
   return (
-    <Section id="how-it-works" dark>
-      <SectionHeader
-        label={t('howItWorks.label')}
-        title=""
-        light
-      />
+    <section id="how-it-works" className="bg-cream py-16 md:py-24 border-b border-border">
+      <div className="container-site">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <span className="inline-block text-xs font-bold uppercase tracking-wider text-saffron bg-ink px-3 py-1 rounded-full mb-3">
+              {t('howItWorks.label')}
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight">
+              {t('howItWorks.title')}
+            </h2>
+          </div>
 
-      <div className="grid gap-16 md:grid-cols-2">
-        {/* Brands */}
-        <div>
-          <h3 className="mb-8 text-xl font-bold text-white border-b border-white/10 pb-4">
-            {t('howItWorks.brandTitle')}
-          </h3>
-          <StepList steps={brandSteps} light />
+          {/* Toggle Switch */}
+          <div className="inline-flex rounded-xl bg-creamDarker/60 p-1.5 border border-border self-start md:self-auto">
+            <button
+              type="button"
+              onClick={() => setActiveRole('brand')}
+              className={`relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+                activeRole === 'brand' ? 'text-ink' : 'text-textMuted hover:text-ink'
+              }`}
+            >
+              {activeRole === 'brand' && (
+                <motion.div
+                  layoutId="activeHowRole"
+                  className="absolute inset-0 rounded-lg bg-creamCard shadow-sm"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <PiBuildings className="relative z-10" />
+              <span className="relative z-10">{t('howItWorks.tabBrand')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveRole('creator')}
+              className={`relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+                activeRole === 'creator' ? 'text-ink' : 'text-textMuted hover:text-ink'
+              }`}
+            >
+              {activeRole === 'creator' && (
+                <motion.div
+                  layoutId="activeHowRole"
+                  className="absolute inset-0 rounded-lg bg-creamCard shadow-sm"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <PiUser className="relative z-10" />
+              <span className="relative z-10">{t('howItWorks.tabCreator')}</span>
+            </button>
+          </div>
         </div>
 
-        {/* Creators */}
-        <div>
-          <h3 className="mb-8 text-xl font-bold text-white border-b border-white/10 pb-4">
-            {t('howItWorks.creatorTitle')}
-          </h3>
-          <StepList steps={creatorSteps} light />
-        </div>
+        {/* Steps Row */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeRole}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            {Array.isArray(currentSteps) &&
+              currentSteps.map((step, idx) => {
+                const Icon = currentIcons[idx] ?? PiCheckCircle
+                return (
+                  <div
+                    key={idx}
+                    className="relative flex flex-col justify-between rounded-2xl border border-creamDarker bg-creamCard p-7 shadow-sm hover:border-border transition-all"
+                  >
+                    <div>
+                      {/* Step Number + Icon Header */}
+                      <div className="flex items-center justify-between mb-6">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink font-display text-sm font-bold text-cream">
+                          0{idx + 1}
+                        </span>
+                        <div className="h-9 w-9 rounded-lg bg-saffronSoft flex items-center justify-center text-saffron">
+                          <Icon size={20} />
+                        </div>
+                      </div>
+
+                      <h3 className="font-display text-xl font-bold text-ink mb-2">
+                        {step.title}
+                      </h3>
+                      <p className="text-sm text-textMuted leading-relaxed">
+                        {step.desc}
+                      </p>
+                    </div>
+
+                    <div className="pt-6 mt-6 border-t border-creamDarker/50 flex items-center justify-between text-xs font-semibold text-textMuted">
+                      <span>{activeRole === 'brand' ? 'Engagement marque' : 'Accompagnement créateur'}</span>
+                      <PiArrowRight className="text-saffron" />
+                    </div>
+                  </div>
+                )
+              })}
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </Section>
+    </section>
   )
 }

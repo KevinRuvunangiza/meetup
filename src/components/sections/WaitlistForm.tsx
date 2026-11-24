@@ -1,697 +1,677 @@
-/**
- * WAITLIST FORM
- * ─────────────────────────────────────────────────────────────────────────────
- * Architecture decisions:
- *
- * 1. NO form library (react-hook-form etc.) — we have two forms with ~15 fields
- *    each. A custom hook is simpler, easier to understand, and saves ~10 KB.
- *
- * 2. Validation is intentionally simple — required, phone format, email format,
- *    URL format. We validate on submit + show inline errors.
- *
- * 3. Honeypot field: a visually hidden input named "website_url". Bots fill it.
- *    Humans never see it. If it's filled, we silently pretend success.
- *
- * 4. The form posts JSON to the Apps Script URL via fetch().
- *    On success → show Success screen with WhatsApp share button.
- *    On duplicate → show friendly message.
- *    On error → show error message, let them retry.
- *
- * 5. Role preselection: parent (App) passes `initialRole` which the Hero sets
- *    when user clicks "I'm a brand" / "I'm a creator".
- */
-import { useState, type FormEvent, type ChangeEvent } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { Section, SectionHeader } from '@/components/ui/Section'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
-import { Chip } from '@/components/ui/Chip'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
+import { brandConfig } from '@/config/brand'
 import { useTranslation } from '@/hooks/useTranslation'
-import { siteConfig } from '@/config/site.config'
-import type {
-  Role,
-  BrandFields,
-  CreatorFields,
-  Sector,
-  CreatorNeed,
-  BudgetRange,
-  CreatorType,
-  Niche,
-  FollowerRange,
-  RateRange,
-} from '@/types/form'
-
-// ─── Validation helpers ───────────────────────────────────────────────────────
-
-const PHONE_RE = /^\+\d{7,15}$/
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const URL_RE = /^https?:\/\/.+/
-
-type Errors = Record<string, string>
-
-// ─── Initial state factories ──────────────────────────────────────────────────
-
-function brandDefaults(role: Role = 'brand'): BrandFields {
-  return {
-    role: role as 'brand',
-    fullName: '',
-    whatsapp: '+243',
-    email: '',
-    city: '',
-    consent: false,
-    honeypot: '',
-    source: new URLSearchParams(window.location.search).get('utm_source') ?? 'direct',
-    businessName: '',
-    sector: '',
-    creatorNeed: '',
-    budget: '',
-    workedBefore: '',
-    websiteOrInsta: '',
-  }
-}
-
-function creatorDefaults(role: Role = 'creator'): CreatorFields {
-  return {
-    role: role as 'creator',
-    fullName: '',
-    whatsapp: '+243',
-    email: '',
-    city: '',
-    consent: false,
-    honeypot: '',
-    source: new URLSearchParams(window.location.search).get('utm_source') ?? 'direct',
-    creatorName: '',
-    creatorType: '',
-    niches: [],
-    instagramHandle: '',
-    instagramFollowers: '',
-    tiktokHandle: '',
-    tiktokFollowers: '',
-    youtubeHandle: '',
-    youtubeFollowers: '',
-    portfolioLink: '',
-    paidBefore: '',
-    rateRange: '',
-  }
-}
-
-// ─── Success screen ───────────────────────────────────────────────────────────
-
-function SuccessScreen() {
-  const { t } = useTranslation()
-
-  const shareUrl = siteConfig.url
-  const shareText = t('form.success.shareMessage', { url: shareUrl })
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.97 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="rounded-2xl bg-white border border-border p-8 text-center max-w-md mx-auto"
-    >
-      {/* Yellow check */}
-      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-signal text-3xl font-bold text-ink">
-        ✓
-      </div>
-
-      <h3 className="mb-3 text-2xl font-bold text-ink">{t('form.success.title')}</h3>
-      <p className="mb-6 text-muted">{t('form.success.body')}</p>
-
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#25D366] px-6 py-3 text-base font-semibold text-white min-h-[44px] transition-opacity hover:opacity-90"
-      >
-        <span aria-hidden="true">📲</span>
-        {t('form.success.share')}
-      </a>
-    </motion.div>
-  )
-}
-
-// ─── MAIN FORM COMPONENT ──────────────────────────────────────────────────────
+import type { Role } from '@/types/form'
+import { validateStep1, normalizePhone } from '@/utils/validation'
+import { SocialLinkInput } from '@/components/ui/SocialLinkInput'
+import {
+  PiBuildings,
+  PiUser,
+  PiCheckCircle,
+  PiArrowRight,
+  PiShareNetwork,
+  PiCheck,
+  PiWarningCircle,
+  PiSpinnerGap,
+  PiInfo,
+} from 'react-icons/pi'
 
 interface WaitlistFormProps {
   initialRole?: Role
 }
 
-export function WaitlistForm({ initialRole }: WaitlistFormProps) {
+export function WaitlistForm({ initialRole = 'brand' }: WaitlistFormProps) {
   const { t } = useTranslation()
+  const shouldReduceMotion = useReducedMotion()
 
-  const [role, setRole] = useState<Role | ''>(initialRole ?? '')
-  const [brand, setBrand] = useState<BrandFields>(brandDefaults())
-  const [creator, setCreator] = useState<CreatorFields>(creatorDefaults())
-  const [errors, setErrors] = useState<Errors>({})
+  const [step, setStep] = useState<1 | 2 | 'success'>(1)
+  const [role, setRole] = useState<Role>(initialRole)
+
+  // Step 1 Essential Fields (Both WhatsApp & Email mandatory)
+  const [fullName, setFullName] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
+  const [email, setEmail] = useState('')
+  const [city, setCity] = useState('Kinshasa')
+  const [honeypot, setHoneypot] = useState('')
+
+  // Step 2 Optional Fields — Brand
+  const [sector, setSector] = useState('')
+  const [budget, setBudget] = useState('')
+  const [brandWebsiteRaw, setBrandWebsiteRaw] = useState('')
+  const [brandWebsiteNorm, setBrandWebsiteNorm] = useState('')
+  const [brandInstaRaw, setBrandInstaRaw] = useState('')
+  const [brandInstaNorm, setBrandInstaNorm] = useState('')
+  const [brandFbRaw, setBrandFbRaw] = useState('')
+  const [brandFbNorm, setBrandFbNorm] = useState('')
+
+  // Step 2 Optional Fields — Creator
+  const [niches, setNiches] = useState<string[]>([])
+  const [creatorInstaRaw, setCreatorInstaRaw] = useState('')
+  const [creatorInstaNorm, setCreatorInstaNorm] = useState('')
+  const [creatorTiktokRaw, setCreatorTiktokRaw] = useState('')
+  const [creatorTiktokNorm, setCreatorTiktokNorm] = useState('')
+  const [creatorYoutubeRaw, setCreatorYoutubeRaw] = useState('')
+  const [creatorYoutubeNorm, setCreatorYoutubeNorm] = useState('')
+  const [creatorFbRaw, setCreatorFbRaw] = useState('')
+  const [creatorFbNorm, setCreatorFbNorm] = useState('')
+  const [creatorPortfolioRaw, setCreatorPortfolioRaw] = useState('')
+  const [creatorPortfolioNorm, setCreatorPortfolioNorm] = useState('')
+
+  // UI state
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [serverError, setServerError] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [copiedLink, setCopiedLink] = useState(false)
 
-  // Update role and reset errors
-  const handleRoleChange = (r: Role) => {
-    setRole(r)
-    setErrors({})
-    setServerError('')
-  }
-
-  // Update brand field
-  const setBrandField = <K extends keyof BrandFields>(key: K, val: BrandFields[K]) => {
-    setBrand((prev) => ({ ...prev, [key]: val }))
-    if (errors[key]) setErrors((e) => { const n = { ...e }; delete n[key]; return n })
-  }
-
-  // Update creator field
-  const setCreatorField = <K extends keyof CreatorFields>(key: K, val: CreatorFields[K]) => {
-    setCreator((prev) => ({ ...prev, [key]: val }))
-    if (errors[key]) setErrors((e) => { const n = { ...e }; delete n[key]; return n })
-  }
-
-  // Toggle niche chip
-  const toggleNiche = (niche: Niche) => {
-    setCreator((prev) => ({
-      ...prev,
-      niches: prev.niches.includes(niche)
-        ? prev.niches.filter((n) => n !== niche)
-        : [...prev.niches, niche],
-    }))
-    if (errors.niches) setErrors((e) => { const n = { ...e }; delete n.niches; return n })
-  }
-
-  // ─── Validation ──────────────────────────────────────────────────────────
-
-  const validate = (): Errors => {
-    const e: Errors = {}
-    const req = t('form.errors.required')
-
-    if (!role) { e.role = t('form.errors.roleRequired'); return e }
-
-    const shared = role === 'brand' ? brand : creator
-    if (!shared.fullName.trim()) e.fullName = req
-    if (!shared.whatsapp.trim() || !PHONE_RE.test(shared.whatsapp.replace(/\s/g, '')))
-      e.whatsapp = t('form.errors.invalidPhone')
-    if (shared.email && !EMAIL_RE.test(shared.email)) e.email = t('form.errors.invalidEmail')
-    if (!shared.city.trim()) e.city = req
-    if (!shared.consent) e.consent = t('form.errors.consentRequired')
-
-    if (role === 'brand') {
-      if (!brand.businessName.trim()) e.businessName = req
-      if (!brand.sector) e.sector = req
-      if (!brand.creatorNeed) e.creatorNeed = req
-      if (!brand.budget) e.budget = req
-      if (!brand.workedBefore) e.workedBefore = req
-      if (brand.websiteOrInsta && !URL_RE.test(brand.websiteOrInsta) && !brand.websiteOrInsta.startsWith('@'))
-        e.websiteOrInsta = t('form.errors.invalidUrl')
+  useEffect(() => {
+    if (initialRole) {
+      setRole(initialRole)
     }
+  }, [initialRole])
 
-    if (role === 'creator') {
-      if (!creator.creatorName.trim()) e.creatorName = req
-      if (!creator.creatorType) e.creatorType = req
-      if (creator.niches.length === 0) e.niches = t('form.errors.selectAtLeastOne')
-      if (!creator.paidBefore) e.paidBefore = req
-      if (creator.portfolioLink && !URL_RE.test(creator.portfolioLink))
-        e.portfolioLink = t('form.errors.invalidUrl')
-      // Require at least one platform handle
-      const hasHandle = creator.instagramHandle || creator.tiktokHandle || creator.youtubeHandle
-      if (!hasHandle) e.instagramHandle = t('form.errors.required')
-    }
-
-    return e
+  const handleRoleToggle = (newRole: Role) => {
+    setRole(newRole)
+    setErrorMsg('')
   }
 
-  // ─── Submit ───────────────────────────────────────────────────────────────
+  const toggleNiche = (nicheId: string) => {
+    setNiches((prev) =>
+      prev.includes(nicheId) ? prev.filter((id) => id !== nicheId) : [...prev, nicheId]
+    )
+  }
 
-  const handleSubmit = async (e: FormEvent) => {
+  // Submit Step 1: Saves essential contact info immediately
+  const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMsg('')
 
-    // Honeypot check — if filled, pretend success silently
-    const honeypotValue = role === 'brand' ? brand.honeypot : creator.honeypot
-    if (honeypotValue) {
-      setSubmitted(true)
+    if (honeypot) {
+      setStep('success')
       return
     }
 
-    const errs = validate()
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs)
-      // Scroll to first error
-      const firstKey = Object.keys(errs)[0]
-      document.getElementById(firstKey)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const validation = validateStep1({ fullName, whatsapp, email, role })
+    if (!validation.ok) {
+      setErrorMsg(validation.error || 'Veuillez vérifier les informations renseignées.')
       return
     }
 
     setSubmitting(true)
-    setServerError('')
 
     const payload = {
       timestamp: new Date().toISOString(),
-      data: role === 'brand' ? brand : creator,
+      data: {
+        role,
+        fullName: fullName.trim(),
+        whatsapp: normalizePhone(whatsapp),
+        email: email.trim(),
+        city: city.trim() || 'Kinshasa',
+        source: 'waitlist_step1',
+      },
     }
 
     try {
-      if (!siteConfig.appsScriptUrl) {
-        // Dev mode — log and fake success
-        console.log('📋 Form payload (no Apps Script URL set):', payload)
-        await new Promise((r) => setTimeout(r, 800))
-        setSubmitted(true)
-        return
-      }
-
-      try {
-        const res = await fetch(siteConfig.appsScriptUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-        })
-
-        if (res.ok) {
-          const json = await res.json()
-          if (json.duplicate) {
-            setServerError(t('form.errors.duplicate'))
-            return
-          }
-        }
-        setSubmitted(true)
-      } catch {
-        // Fallback for Google Apps Script redirect CORS quirk
-        await fetch(siteConfig.appsScriptUrl, {
+      if (brandConfig.appsScriptUrl) {
+        await fetch(brandConfig.appsScriptUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
-        setSubmitted(true)
       }
-    } catch {
-      setServerError(t('form.errors.serverError'))
-    } finally {
       setSubmitting(false)
+      setStep(2)
+    } catch (err) {
+      console.warn('Submission fallback applied:', err)
+      setSubmitting(false)
+      setStep(2)
     }
   }
 
-  // ─── Option lists (read from translation) ────────────────────────────────
+  // Submit Step 2: Enriches existing record
+  const handleStep2Submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrorMsg('')
 
-  const sectorOptions = Object.entries(
-    t('form.sectors') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
+    if (!fullName.trim() || !whatsapp.trim() || !email.trim()) {
+      setErrorMsg('Veuillez d’abord renseigner vos coordonnées (nom, WhatsApp et email) à l’étape 1.')
+      setStep(1)
+      return
+    }
 
-  const needOptions = Object.entries(
-    t('form.creatorNeeds') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
+    setSubmitting(true)
 
-  const budgetOptions = Object.entries(
-    t('form.budgets') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
+    const payload = {
+      timestamp: new Date().toISOString(),
+      data: {
+        role,
+        fullName: fullName.trim(),
+        whatsapp: normalizePhone(whatsapp),
+        email: email.trim(),
+        city: city.trim() || 'Kinshasa',
+        sector: role === 'brand' ? sector : '',
+        budget: role === 'brand' ? budget : '',
+        website: role === 'brand' ? (brandWebsiteNorm || brandWebsiteRaw) : '',
+        instagram: role === 'brand' ? (brandInstaNorm || brandInstaRaw) : (creatorInstaNorm || creatorInstaRaw),
+        facebook: role === 'brand' ? (brandFbNorm || brandFbRaw) : (creatorFbNorm || creatorFbRaw),
+        niches: role === 'creator' ? niches : [],
+        tiktok: role === 'creator' ? (creatorTiktokNorm || creatorTiktokRaw) : '',
+        youtube: role === 'creator' ? (creatorYoutubeNorm || creatorYoutubeRaw) : '',
+        portfolioLink: role === 'creator' ? (creatorPortfolioNorm || creatorPortfolioRaw) : '',
+        source: 'waitlist_step2_enrichment',
+      },
+    }
 
-  const creatorTypeOptions = Object.entries(
-    t('form.creatorTypes') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
+    try {
+      if (brandConfig.appsScriptUrl) {
+        await fetch(brandConfig.appsScriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+      }
+      setSubmitting(false)
+      setStep('success')
+    } catch (err) {
+      console.warn('Enrichment fallback applied:', err)
+      setSubmitting(false)
+      setStep('success')
+    }
+  }
 
-  const followerOptions = Object.entries(
-    t('form.followerRanges') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
-
-  const rateOptions = Object.entries(
-    t('form.rateRanges') as unknown as Record<string, string>,
-  ).map(([value, label]) => ({ value, label }))
-
-  const nicheKeys: Niche[] = [
-    'fashion','beauty','food','lifestyle','fitness','tech',
-    'auto','travel','parenting','finance','music','comedy','other',
-  ]
-
-  const nicheLabels = t('form.nicheOptions') as unknown as Record<string, string>
-
-  // ─── Render ───────────────────────────────────────────────────────────────
+  const handleCopyShare = async () => {
+    const shareUrl = window.location.origin
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl)
+        setCopiedLink(true)
+        setTimeout(() => setCopiedLink(false), 3000)
+      }
+    } catch {
+      // Fallback
+    }
+  }
 
   return (
-    <Section id="waitlist" dark>
-      <SectionHeader
-        label=""
-        title={t('form.title')}
-        subtitle={t('form.subtitle')}
-        light
-      />
+    <section id="waitlist" className="bg-cream py-16 md:py-24 border-b border-border scroll-mt-12">
+      <div className="container-site max-w-2xl">
+        <div className="rounded-3xl border border-creamDarker bg-creamCard p-8 md:p-12 shadow-xl">
+          {/* Honeypot field (hidden from screen) */}
+          <input
+            type="text"
+            name="hp_field"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            className="hidden"
+            tabIndex={-1}
+            autoComplete="off"
+          />
 
-      <AnimatePresence mode="wait">
-        {submitted ? (
-          <SuccessScreen key="success" />
-        ) : (
-          <motion.form
-            key="form"
-            onSubmit={handleSubmit}
-            noValidate
-            aria-label={t('form.title')}
-            className="max-w-2xl"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {/* ── Honeypot (hidden from humans) ── */}
-            <div className="sr-only" aria-hidden="true">
-              <label htmlFor="website_url">Leave this empty</label>
-              <input
-                id="website_url"
-                name="website_url"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                value={role === 'brand' ? brand.honeypot : creator.honeypot}
-                onChange={(e) =>
-                  role === 'brand'
-                    ? setBrandField('honeypot', e.target.value)
-                    : setCreatorField('honeypot', e.target.value)
-                }
-              />
+          {/* Step Indicator Tabs */}
+          {step !== 'success' && (
+            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-cream border border-border mb-8">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                  step === 1
+                    ? 'bg-creamCard text-ink shadow-sm'
+                    : 'text-textMuted hover:text-ink'
+                }`}
+              >
+                <span>1. Coordonnées</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                  step === 2
+                    ? 'bg-creamCard text-ink shadow-sm'
+                    : 'text-textMuted hover:text-ink'
+                }`}
+              >
+                <span>2. Réseaux & Liens (facultatif)</span>
+              </button>
             </div>
+          )}
 
-            {/* ── Role selector ── */}
-            <fieldset className="mb-8">
-              <legend className="mb-3 text-sm font-medium text-white">
-                {t('form.roleLabel')} <span className="text-white/50" aria-hidden="true">*</span>
-              </legend>
-              {errors.role && (
-                <p role="alert" className="mb-2 text-xs text-red-400">{errors.role}</p>
-              )}
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {(['brand', 'creator'] as Role[]).map((r) => (
+          <AnimatePresence mode="wait">
+            {/* ─── STEP 1 ─── */}
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="text-center mb-8">
+                  <span className="inline-block text-xs font-bold uppercase tracking-wider text-saffron bg-ink px-3 py-1 rounded-full mb-3">
+                    Liste d'attente prioritaire
+                  </span>
+                  <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-ink tracking-tight">
+                    {t('form.step1Title')}
+                  </h2>
+                  <p className="text-sm text-textMuted mt-2">
+                    {t('form.step1Subtitle')}
+                  </p>
+                </div>
+
+                {/* Role Switcher */}
+                <div className="grid grid-cols-2 gap-3 p-1.5 rounded-2xl bg-cream border border-border mb-8">
                   <button
-                    key={r}
                     type="button"
-                    role="radio"
-                    aria-checked={role === r}
-                    onClick={() => handleRoleChange(r)}
-                    className={[
-                      'flex-1 rounded-xl border-2 p-4 text-left transition-colors duration-150 min-h-[64px]',
-                      role === r
-                        ? 'border-signal bg-signal/10 text-white'
-                        : 'border-white/20 bg-white/5 text-white/70 hover:border-white/40',
-                    ].join(' ')}
+                    onClick={() => handleRoleToggle('brand')}
+                    className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
+                      role === 'brand'
+                        ? 'bg-creamCard text-ink shadow-sm'
+                        : 'text-textMuted hover:text-ink'
+                    }`}
                   >
-                    <span className="font-semibold">
-                      {r === 'brand' ? t('form.roleBrand') : t('form.roleCreator')}
-                    </span>
+                    <PiBuildings size={18} className={role === 'brand' ? 'text-saffron' : ''} />
+                    <span>{t('form.roleBrand')}</span>
                   </button>
-                ))}
-              </div>
-            </fieldset>
 
-            {/* ── Shared fields ── */}
-            {role && (
-              <div className="flex flex-col gap-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Input
-                    id="fullName"
-                    label={t('form.fullName')}
-                    value={role === 'brand' ? brand.fullName : creator.fullName}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      role === 'brand'
-                        ? setBrandField('fullName', e.target.value)
-                        : setCreatorField('fullName', e.target.value)
-                    }
-                    required
-                    autoComplete="name"
-                    error={errors.fullName}
-                  />
-                  <Input
-                    id="whatsapp"
-                    label={t('form.whatsapp')}
-                    type="tel"
-                    placeholder={t('form.whatsappPlaceholder')}
-                    value={role === 'brand' ? brand.whatsapp : creator.whatsapp}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      role === 'brand'
-                        ? setBrandField('whatsapp', e.target.value)
-                        : setCreatorField('whatsapp', e.target.value)
-                    }
-                    required
-                    autoComplete="tel"
-                    inputMode="tel"
-                    error={errors.whatsapp}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRoleToggle('creator')}
+                    className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
+                      role === 'creator'
+                        ? 'bg-creamCard text-ink shadow-sm'
+                        : 'text-textMuted hover:text-ink'
+                    }`}
+                  >
+                    <PiUser size={18} className={role === 'creator' ? 'text-saffron' : ''} />
+                    <span>{t('form.roleCreator')}</span>
+                  </button>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Input
-                    id="email"
-                    label={t('form.email')}
-                    type="email"
-                    placeholder={t('form.emailPlaceholder')}
-                    value={role === 'brand' ? brand.email : creator.email}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      role === 'brand'
-                        ? setBrandField('email', e.target.value)
-                        : setCreatorField('email', e.target.value)
-                    }
-                    autoComplete="email"
-                    error={errors.email}
-                  />
-                  <Input
-                    id="city"
-                    label={t('form.city')}
-                    placeholder={t('form.cityPlaceholder')}
-                    value={role === 'brand' ? brand.city : creator.city}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      role === 'brand'
-                        ? setBrandField('city', e.target.value)
-                        : setCreatorField('city', e.target.value)
-                    }
-                    required
-                    autoComplete="address-level2"
-                    error={errors.city}
-                  />
-                </div>
-
-                {/* ── Brand-specific fields ── */}
-                {role === 'brand' && (
-                  <>
-                    <Input
-                      id="businessName"
-                      label={t('form.businessName')}
-                      value={brand.businessName}
-                      onChange={(e) => setBrandField('businessName', e.target.value)}
-                      required
-                      error={errors.businessName}
-                    />
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Select
-                        id="sector"
-                        label={t('form.sector')}
-                        value={brand.sector}
-                        onChange={(e) => setBrandField('sector', e.target.value as Sector)}
-                        placeholder={t('form.sectorPlaceholder')}
-                        options={sectorOptions}
-                        required
-                        error={errors.sector}
-                      />
-                      <Select
-                        id="creatorNeed"
-                        label={t('form.creatorNeed')}
-                        value={brand.creatorNeed}
-                        onChange={(e) => setBrandField('creatorNeed', e.target.value as CreatorNeed)}
-                        placeholder={t('form.creatorNeedPlaceholder')}
-                        options={needOptions}
-                        required
-                        error={errors.creatorNeed}
-                      />
-                    </div>
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Select
-                        id="budget"
-                        label={t('form.budget')}
-                        value={brand.budget}
-                        onChange={(e) => setBrandField('budget', e.target.value as BudgetRange)}
-                        placeholder={t('form.budgetPlaceholder')}
-                        options={budgetOptions}
-                        required
-                        error={errors.budget}
-                      />
-                      <Select
-                        id="workedBefore"
-                        label={t('form.workedBefore')}
-                        value={brand.workedBefore}
-                        onChange={(e) => setBrandField('workedBefore', e.target.value as 'yes' | 'no')}
-                        placeholder={t('form.workedBeforePlaceholder')}
-                        options={[
-                          { value: 'yes', label: t('form.yes') },
-                          { value: 'no', label: t('form.no') },
-                        ]}
-                        required
-                        error={errors.workedBefore}
-                      />
-                    </div>
-                    <Input
-                      id="websiteOrInsta"
-                      label={t('form.websiteOrInsta')}
-                      placeholder={t('form.websiteOrInstaPlaceholder')}
-                      value={brand.websiteOrInsta}
-                      onChange={(e) => setBrandField('websiteOrInsta', e.target.value)}
-                      error={errors.websiteOrInsta}
-                    />
-                  </>
+                {/* Error Banner */}
+                {errorMsg && (
+                  <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-xs font-semibold text-red-700 flex items-center gap-2.5 mb-6">
+                    <PiWarningCircle size={18} className="flex-shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
                 )}
 
-                {/* ── Creator-specific fields ── */}
-                {role === 'creator' && (
-                  <>
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Input
-                        id="creatorName"
-                        label={t('form.creatorName')}
-                        value={creator.creatorName}
-                        onChange={(e) => setCreatorField('creatorName', e.target.value)}
-                        required
-                        error={errors.creatorName}
-                      />
-                      <Select
-                        id="creatorType"
-                        label={t('form.creatorType')}
-                        value={creator.creatorType}
-                        onChange={(e) => setCreatorField('creatorType', e.target.value as CreatorType)}
-                        placeholder={t('form.creatorTypePlaceholder')}
-                        options={creatorTypeOptions}
-                        required
-                        error={errors.creatorType}
-                      />
+                <form onSubmit={handleStep1Submit} className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                      {t('form.fullName')} <span className="text-saffron">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder={t('form.fullNamePlaceholder')}
+                      className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink placeholder:text-textMuted/60 focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                      {t('form.whatsapp')} <span className="text-saffron">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      placeholder={t('form.whatsappPlaceholder')}
+                      className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink placeholder:text-textMuted/60 focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                    />
+                    <p className="text-[11px] text-textMuted mt-1">
+                      Numéro utilisé pour vous notifier de l'ouverture de votre accès.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                      {t('form.email')} <span className="text-saffron">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder={t('form.emailPlaceholder')}
+                      className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink placeholder:text-textMuted/60 focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                      {t('form.city')}
+                    </label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder={t('form.cityPlaceholder')}
+                      className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink placeholder:text-textMuted/60 focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full rounded-xl bg-saffron py-4 text-sm font-extrabold text-ink hover:bg-saffronHover transition-all shadow-md flex items-center justify-center gap-2 mt-6 disabled:opacity-60"
+                  >
+                    {submitting ? (
+                      <>
+                        <PiSpinnerGap className="animate-spin text-lg" />
+                        <span>Enregistrement...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{t('form.step1Submit')}</span>
+                        <PiArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </form>
+              </motion.div>
+            )}
+
+            {/* ─── STEP 2 (Optional Enrichment with Social Auto-Normalization) ─── */}
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="rounded-xl bg-saffronSoft border border-saffron/40 p-4 mb-6 flex items-center gap-3">
+                  <PiCheckCircle size={24} className="text-saffron flex-shrink-0" />
+                  <div>
+                    <div className="text-xs font-bold text-ink">Place prioritaire réservée !</div>
+                    <div className="text-[11px] text-textMuted">
+                      Complétez ces informations pour nous aider à vérifier votre profil plus vite.
                     </div>
+                  </div>
+                </div>
 
-                    {/* Niches multi-select */}
-                    <fieldset>
-                      <legend className="mb-3 text-sm font-medium text-ink">
-                        {t('form.niches')} <span className="text-muted" aria-hidden="true">*</span>
-                      </legend>
-                      {errors.niches && (
-                        <p role="alert" className="mb-2 text-xs text-red-600">{errors.niches}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                        {nicheKeys.map((niche) => (
-                          <Chip
-                            key={niche}
-                            label={nicheLabels[niche] ?? niche}
-                            selected={creator.niches.includes(niche)}
-                            onToggle={() => toggleNiche(niche)}
-                          />
-                        ))}
+                <div className="mb-6">
+                  <h2 className="font-display text-2xl font-extrabold text-ink tracking-tight">
+                    {t('form.step2Title')}
+                  </h2>
+                  <p className="text-xs text-textMuted mt-1">
+                    {t('form.step2Subtitle')}
+                  </p>
+                </div>
+
+                {/* Gentle line helper */}
+                <div className="rounded-xl bg-cream border border-border p-3.5 flex items-center gap-2.5 mb-6 text-xs text-textMuted">
+                  <PiInfo size={16} className="text-saffron flex-shrink-0" />
+                  <span>{t('form.socialLinksHelper')}</span>
+                </div>
+
+                <form onSubmit={handleStep2Submit} className="space-y-5">
+                  {role === 'brand' ? (
+                    <>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                          {t('form.sector')}
+                        </label>
+                        <select
+                          value={sector}
+                          onChange={(e) => setSector(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                        >
+                          <option value="">{t('form.sectorPlaceholder')}</option>
+                          <option value="fashion">{t('form.sectors.fashion')}</option>
+                          <option value="beauty">{t('form.sectors.beauty')}</option>
+                          <option value="food">{t('form.sectors.food')}</option>
+                          <option value="hospitality">{t('form.sectors.hospitality')}</option>
+                          <option value="auto">{t('form.sectors.auto')}</option>
+                          <option value="tech">{t('form.sectors.tech')}</option>
+                          <option value="finance">{t('form.sectors.finance')}</option>
+                          <option value="other">{t('form.sectors.other')}</option>
+                        </select>
                       </div>
-                    </fieldset>
 
-                    {/* Platform handles */}
-                    {(['instagram', 'tiktok', 'youtube'] as const).map((platform) => {
-                      const handleKey = `${platform}Handle` as keyof CreatorFields
-                      const followersKey = `${platform}Followers` as keyof CreatorFields
-                      const handleLabel = t(`form.${platform}Handle` as Parameters<typeof t>[0])
-                      const handlePlaceholder = t(`form.${platform}HandlePlaceholder` as Parameters<typeof t>[0])
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                          {t('form.budget')}
+                        </label>
+                        <select
+                          value={budget}
+                          onChange={(e) => setBudget(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-cream px-4 py-3 text-sm text-ink focus:border-saffron focus:bg-creamCard focus:outline-none focus:ring-2 focus:ring-saffron/20 transition-all"
+                        >
+                          <option value="">{t('form.budgetPlaceholder')}</option>
+                          <option value="under_200">{t('form.budgets.under_200')}</option>
+                          <option value="200_500">{t('form.budgets.200_500')}</option>
+                          <option value="500_1000">{t('form.budgets.500_1000')}</option>
+                          <option value="1000_plus">{t('form.budgets.1000_plus')}</option>
+                          <option value="gifting_only">{t('form.budgets.gifting_only')}</option>
+                        </select>
+                      </div>
 
-                      return (
-                        <div key={platform} className="grid gap-3 md:grid-cols-2">
-                          <Input
-                            id={handleKey}
-                            label={`${t(`form.${platform}` as Parameters<typeof t>[0])} — ${handleLabel}`}
-                            placeholder={handlePlaceholder}
-                            value={creator[handleKey] as string}
-                            onChange={(e) => setCreatorField(handleKey, e.target.value)}
-                            error={platform === 'instagram' ? errors.instagramHandle : undefined}
-                          />
-                          <Select
-                            id={followersKey}
-                            label={t('form.followerRange')}
-                            value={creator[followersKey] as string}
-                            onChange={(e) =>
-                              setCreatorField(followersKey, e.target.value as FollowerRange)
+                      {/* Brand Links with Auto-Normalization */}
+                      <div className="space-y-3 pt-2">
+                        <div className="text-xs font-bold uppercase tracking-wider text-textMuted">
+                          Présence en ligne (facultatif)
+                        </div>
+
+                        <SocialLinkInput
+                          type="website"
+                          label={t('form.website')}
+                          placeholder="https://votre-marque.com ou votre-marque.com"
+                          value={brandWebsiteRaw}
+                          onChange={(raw, norm) => {
+                            setBrandWebsiteRaw(raw)
+                            setBrandWebsiteNorm(norm)
+                          }}
+                        />
+
+                        <SocialLinkInput
+                          type="instagram"
+                          label={t('form.instagram')}
+                          placeholder="@votre_marque ou lien Instagram"
+                          value={brandInstaRaw}
+                          onChange={(raw, norm) => {
+                            setBrandInstaRaw(raw)
+                            setBrandInstaNorm(norm)
+                          }}
+                        />
+
+                        <SocialLinkInput
+                          type="facebook"
+                          label={t('form.facebook')}
+                          placeholder="Nom de page ou lien Facebook"
+                          value={brandFbRaw}
+                          onChange={(raw, norm) => {
+                            setBrandFbRaw(raw)
+                            setBrandFbNorm(norm)
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-ink mb-2">
+                          {t('form.niches')}
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {['Mode', 'Beauté', 'Food', 'Lifestyle', 'Tech', 'Auto', 'Voyage', 'Comédie'].map(
+                            (n) => {
+                              const isChecked = niches.includes(n)
+                              return (
+                                <button
+                                  key={n}
+                                  type="button"
+                                  onClick={() => toggleNiche(n)}
+                                  className={`rounded-lg px-3 py-1.5 text-xs font-bold border transition-all ${
+                                    isChecked
+                                      ? 'bg-ink text-cream border-ink'
+                                      : 'bg-cream text-textMuted border-border hover:border-ink'
+                                  }`}
+                                >
+                                  {n}
+                                </button>
+                              )
                             }
-                            placeholder={t('form.followerRangePlaceholder')}
-                            options={followerOptions}
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Creator Social Links with Auto-Normalization */}
+                      <div className="space-y-3 pt-2">
+                        <div className="text-xs font-bold uppercase tracking-wider text-textMuted">
+                          Vos liens (facultatif)
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <SocialLinkInput
+                            type="instagram"
+                            label={t('form.instagram')}
+                            placeholder="@votrecompte ou lien"
+                            value={creatorInstaRaw}
+                            onChange={(raw, norm) => {
+                              setCreatorInstaRaw(raw)
+                              setCreatorInstaNorm(norm)
+                            }}
+                          />
+
+                          <SocialLinkInput
+                            type="tiktok"
+                            label={t('form.tiktok')}
+                            placeholder="@votrecompte ou lien"
+                            value={creatorTiktokRaw}
+                            onChange={(raw, norm) => {
+                              setCreatorTiktokRaw(raw)
+                              setCreatorTiktokNorm(norm)
+                            }}
                           />
                         </div>
-                      )
-                    })}
 
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Input
-                        id="portfolioLink"
-                        label={t('form.portfolioLink')}
-                        placeholder={t('form.portfolioLinkPlaceholder')}
-                        type="url"
-                        value={creator.portfolioLink}
-                        onChange={(e) => setCreatorField('portfolioLink', e.target.value)}
-                        error={errors.portfolioLink}
-                      />
-                      <Select
-                        id="paidBefore"
-                        label={t('form.paidBefore')}
-                        value={creator.paidBefore}
-                        onChange={(e) => setCreatorField('paidBefore', e.target.value as 'yes' | 'no')}
-                        placeholder={t('form.workedBeforePlaceholder')}
-                        options={[
-                          { value: 'yes', label: t('form.yes') },
-                          { value: 'no', label: t('form.no') },
-                        ]}
-                        required
-                        error={errors.paidBefore}
-                      />
-                    </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <SocialLinkInput
+                            type="youtube"
+                            label={t('form.youtube')}
+                            placeholder="@votrechaine ou lien"
+                            value={creatorYoutubeRaw}
+                            onChange={(raw, norm) => {
+                              setCreatorYoutubeRaw(raw)
+                              setCreatorYoutubeNorm(norm)
+                            }}
+                          />
 
-                    <Select
-                      id="rateRange"
-                      label={t('form.rateRange')}
-                      value={creator.rateRange}
-                      onChange={(e) => setCreatorField('rateRange', e.target.value as RateRange)}
-                      placeholder={t('form.rateRangePlaceholder')}
-                      options={rateOptions}
-                    />
-                  </>
-                )}
+                          <SocialLinkInput
+                            type="facebook"
+                            label={t('form.facebook')}
+                            placeholder="Page ou profil Facebook"
+                            value={creatorFbRaw}
+                            onChange={(raw, norm) => {
+                              setCreatorFbRaw(raw)
+                              setCreatorFbNorm(norm)
+                            }}
+                          />
+                        </div>
 
-                {/* ── Consent ── */}
-                <div className="flex items-start gap-3">
-                  <input
-                    id="consent"
-                    type="checkbox"
-                    className="mt-1 h-5 w-5 flex-shrink-0 rounded border-border accent-signal cursor-pointer"
-                    checked={role === 'brand' ? brand.consent : creator.consent}
-                    onChange={(e) =>
-                      role === 'brand'
-                        ? setBrandField('consent', e.target.checked)
-                        : setCreatorField('consent', e.target.checked)
-                    }
-                    aria-describedby={errors.consent ? 'consent-error' : undefined}
-                    aria-invalid={errors.consent ? 'true' : undefined}
-                  />
-                  <div>
-                    <label htmlFor="consent" className="text-sm text-muted cursor-pointer">
-                      {t('form.consent')}
-                    </label>
-                    {errors.consent && (
-                      <p id="consent-error" role="alert" className="mt-1 text-xs text-red-600">
-                        {errors.consent}
-                      </p>
-                    )}
+                        <SocialLinkInput
+                          type="portfolio"
+                          label={t('form.portfolio')}
+                          placeholder="Lien Drive, portfolio, ou vidéo modèle (ex: https://...)"
+                          value={creatorPortfolioRaw}
+                          onChange={(raw, norm) => {
+                            setCreatorPortfolioRaw(raw)
+                            setCreatorPortfolioNorm(norm)
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3 pt-4">
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full sm:flex-1 rounded-xl bg-saffron py-3.5 text-sm font-extrabold text-ink hover:bg-saffronHover transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {submitting ? (
+                        <>
+                          <PiSpinnerGap className="animate-spin text-lg" />
+                          <span>Mise à jour...</span>
+                        </>
+                      ) : (
+                        <span>{t('form.step2Submit')}</span>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="w-full sm:w-auto rounded-xl border border-border px-4 py-3.5 text-xs font-bold text-textMuted hover:text-ink hover:bg-cream transition-colors cursor-pointer"
+                    >
+                      ← Revenir à l'étape 1
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setStep('success')}
+                      className="w-full sm:w-auto rounded-xl border border-border px-4 py-3.5 text-xs font-bold text-textMuted hover:text-ink hover:bg-cream transition-colors cursor-pointer"
+                    >
+                      {t('form.skipStep2')}
+                    </button>
                   </div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* ─── SUCCESS STATE ─── */}
+            {step === 'success' && (
+              <motion.div
+                key="success"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-center py-6"
+              >
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-saffron text-ink shadow-lg">
+                  <PiCheck size={32} />
                 </div>
 
-                {/* ── Server error ── */}
-                {serverError && (
-                  <div role="alert" className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    {serverError}
-                  </div>
-                )}
+                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-ink tracking-tight mb-3">
+                  {t('form.successTitle')}
+                </h2>
 
-                {/* ── Submit ── */}
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  fullWidth
-                  disabled={submitting}
-                >
-                  {submitting ? t('form.submitting') : t('form.submit')}
-                </Button>
-              </div>
+                <p className="text-sm text-textMuted max-w-md mx-auto leading-relaxed mb-8">
+                  {t('form.successMessage')}
+                </p>
+
+                <div className="rounded-2xl bg-cream border border-border p-6 max-w-md mx-auto">
+                  <div className="text-xs font-bold text-ink mb-3">
+                    Partager l'accès prioritaire
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyShare}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink py-3 text-xs font-bold text-cream hover:bg-charcoal transition-colors"
+                  >
+                    {copiedLink ? (
+                      <>
+                        <PiCheck size={16} className="text-saffron" />
+                        <span>{t('form.shareSuccess')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <PiShareNetwork size={16} />
+                        <span>{t('form.shareCta')}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
             )}
-          </motion.form>
-        )}
-      </AnimatePresence>
-    </Section>
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
   )
 }

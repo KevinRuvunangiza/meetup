@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react'
-import { siteConfig } from '@/config/site.config'
+import { brandConfig } from '@/config/brand'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Role } from '@/types/form'
 import { featuredCreatorCards } from '@/data/creatorCards'
@@ -55,18 +55,17 @@ export function Hero({ onRoleSelect, initialRole }: HeroProps) {
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-6 flex flex-wrap items-center gap-2"
+            className="mb-6 flex flex-wrap items-center gap-2.5"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full bg-creamDarker/80 border border-border px-3 py-1 text-xs font-semibold text-ink">
               <span className="h-2 w-2 rounded-full bg-saffron" aria-hidden="true" />
-              <span>{siteConfig.name} · RDC</span>
+              <span>{brandConfig.name}</span>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-textMuted">
-              <span>Kinshasa</span>
-              <span>•</span>
-              <span>Lubumbashi</span>
-              <span>•</span>
-              <span>Goma</span>
+            <span className="text-xs text-textMuted font-medium">
+              Lancement en RDC · Kinshasa
+            </span>
+            <span className="text-[11px] text-textMuted/80 hidden sm:inline-block">
+              · {t('hero.meaningNote')}
             </span>
           </m.div>
 
@@ -250,7 +249,7 @@ export function Hero({ onRoleSelect, initialRole }: HeroProps) {
           >
             <div className="flex items-center justify-between gap-3 max-w-md mx-auto">
               <div className="flex flex-col">
-                <span className="font-display font-bold text-xs text-ink">{siteConfig.name}</span>
+                <span className="font-display font-bold text-xs text-ink">{brandConfig.name}</span>
                 <span className="text-[11px] text-muted">Accès prioritaire gratuit</span>
               </div>
               <button

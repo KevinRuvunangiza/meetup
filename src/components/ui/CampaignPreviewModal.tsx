@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import type { CampaignItem } from '@/data/examples'
-import { siteConfig } from '@/config/site.config'
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import type { CampaignItem } from "@/data/examples";
+import { siteConfig } from "@/config/site.config";
 import {
   PiX,
   PiVideoCamera,
@@ -13,47 +13,55 @@ import {
   PiArrowRight,
   PiUsers,
   PiCurrencyDollar,
-} from 'react-icons/pi'
+} from "react-icons/pi";
 
 interface CampaignPreviewModalProps {
-  campaign: CampaignItem | null
-  onClose: () => void
-  onJoinWaitlist: () => void
+  campaign: CampaignItem | null;
+  onClose: () => void;
+  onJoinWaitlist: () => void;
 }
 
-export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: CampaignPreviewModalProps) {
-  const dialogRef = useRef<HTMLDivElement>(null)
+export function CampaignPreviewModal({
+  campaign,
+  onClose,
+  onJoinWaitlist,
+}: CampaignPreviewModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+      if (e.key === "Escape") onClose();
+    };
     if (campaign) {
-      window.addEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'hidden'
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
-    }
-  }, [campaign, onClose])
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [campaign, onClose]);
 
-  if (!campaign) return null
+  if (!campaign) return null;
 
-  const getCollabIcon = (type: CampaignItem['collabType']) => {
+  const getCollabIcon = (type: CampaignItem["collabType"]) => {
     switch (type) {
-      case 'UGC': return <PiVideoCamera className="text-saffron" size={16} />
-      case 'Influence': return <PiMegaphone className="text-saffron" size={16} />
-      case 'Hybride': return <PiShuffle className="text-saffron" size={16} />
-      case 'Gifting': return <PiGift className="text-saffron" size={16} />
+      case "UGC":
+        return <PiVideoCamera className="text-saffron" size={16} />;
+      case "Influence":
+        return <PiMegaphone className="text-saffron" size={16} />;
+      case "Hybride":
+        return <PiShuffle className="text-saffron" size={16} />;
+      case "Gifting":
+        return <PiGift className="text-saffron" size={16} />;
     }
-  }
+  };
 
   const handleCtaClick = () => {
-    onClose()
-    onJoinWaitlist()
-  }
+    onClose();
+    onJoinWaitlist();
+  };
 
   return (
     <AnimatePresence>
@@ -71,7 +79,7 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
           transition={{ duration: 0.2 }}
           onClick={onClose}
           className="fixed inset-0 bg-ink/75 backdrop-blur-sm"
-          style={{ overscrollBehavior: 'contain' }}
+          style={{ overscrollBehavior: "contain" }}
         />
 
         {/* Modal Window */}
@@ -80,9 +88,9 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
           initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-creamDarker/80 bg-creamCard text-ink shadow-2xl"
-          style={{ overscrollBehavior: 'contain' }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-creamDarker/80 bg-cream text-ink shadow-2xl"
+          style={{ overscrollBehavior: "contain" }}
         >
           {/* Header Bar */}
           <div className="flex items-center justify-between border-b border-border bg-cream/50 px-6 py-4">
@@ -91,8 +99,12 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
                 {campaign.brandInitials}
               </span>
               <div>
-                <p className="text-xs font-bold text-ink leading-none">{campaign.brandName}</p>
-                <p className="text-[11px] text-muted capitalize mt-0.5">{campaign.category}</p>
+                <p className="text-xs font-bold text-ink leading-none">
+                  {campaign.brandName}
+                </p>
+                <p className="text-[11px] text-muted capitalize mt-0.5">
+                  {campaign.category}
+                </p>
               </div>
             </div>
 
@@ -119,7 +131,10 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
               </span>
             </div>
 
-            <h3 id="campaign-modal-title" className="text-xl font-bold font-display text-ink mb-2">
+            <h3
+              id="campaign-modal-title"
+              className="text-xl font-bold font-display text-ink mb-2"
+            >
               {campaign.title}
             </h3>
             <p className="text-sm text-muted leading-relaxed mb-5">
@@ -131,28 +146,42 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
               <div className="flex items-center gap-2">
                 <PiCurrencyDollar className="text-saffron" size={18} />
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-muted">Budget</span>
-                  <span className="font-semibold text-ink">{campaign.budget}</span>
+                  <span className="block text-[10px] uppercase font-bold text-muted">
+                    Budget
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {campaign.budget}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <PiClock className="text-saffron" size={18} />
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-muted">Délai estimé</span>
-                  <span className="font-semibold text-ink">{campaign.deadline}</span>
+                  <span className="block text-[10px] uppercase font-bold text-muted">
+                    Délai estimé
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {campaign.deadline}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <PiUsers className="text-saffron" size={18} />
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-muted">Créateurs</span>
-                  <span className="font-semibold text-ink">{campaign.creatorsNeeded} recherchés</span>
+                  <span className="block text-[10px] uppercase font-bold text-muted">
+                    Créateurs
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {campaign.creatorsNeeded} recherchés
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <PiSealCheck className="text-saffron" size={18} />
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-muted">Cadre</span>
+                  <span className="block text-[10px] uppercase font-bold text-muted">
+                    Cadre
+                  </span>
                   <span className="font-semibold text-ink">Accord écrit</span>
                 </div>
               </div>
@@ -181,7 +210,10 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
                 Comment postuler à ces opportunités ?
               </p>
               <p className="text-xs text-muted leading-relaxed">
-                {siteConfig.name} ouvre progressivement ses accès. Les créateurs et marques sur la liste prioritaire recevront les briefs détaillés et les premières mises en relation avant le lancement public.
+                {siteConfig.name} ouvre progressivement ses accès. Les créateurs
+                et marques sur la liste prioritaire recevront les briefs
+                détaillés et les premières mises en relation avant le lancement
+                public.
               </p>
             </div>
 
@@ -198,5 +230,5 @@ export function CampaignPreviewModal({ campaign, onClose, onJoinWaitlist }: Camp
         </motion.div>
       </div>
     </AnimatePresence>
-  )
+  );
 }
